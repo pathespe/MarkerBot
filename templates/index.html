@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% block content %}
+
+    <div class = "col-md-4">
+                <div class="panel-group" id="accordion">
+    {% for question in questions %}
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a onclick="javascript:changeText({{loop.index}});" data-toggle="collapse" data-parent="#accordion" href="#session{{loop.index}}">
+                    Session {{loop.index}}</a>
+                </h4>
+                </div>
+                <div id="session{{loop.index}}" class="panel-collapse collapse">
+                    <table class="table table-hover" id="projects-list" >
+                        <thead>
+                        <tr>
+                            <th>Question</th>
+                            <th>File</th>
+                            <th> </th>
+                            <th>Result</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for q in question %}
+                        <tr>
+                            <form class="upload-file" method="post" enctype="multipart/form-data">
+                                <td>{{q}}</td>
+                                <td>
+                                    <fieldset>
+                                        <input name="file" type="file">
+                                    </fieldset>
+                                </td>
+                                <td>
+                                    <fieldset>
+                                        <button  class="btn btn-primary" id="upload-file-btn"  type="submit">Submit</button>
+                                    </fieldset>
+                                </td>
+                                <input name='q_name' type="hidden" value="{{q}}">
+                            </form>
+                            <td><div id="{{q}}"></div></td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+    {% endfor %}
+        </div>
+    </div>
+    <div id="main-div" class = "col-md-8">
+        {{readme|markdown}} 
+    </div>
+{% endblock %}
+{% block scripts %}
+<script>
+    var frm = $('.upload-file');
+    frm.submit(function (ev) {
+        console.log('sdffsd');
+        ev.preventDefault();
+        // div = $('<div class="progress"><div></div><div>0%</div><div>...</div><div>&nbsp;</div></div><hr>');
+        // $('#progress').append(div);
+        // // create a progress bar
+        // var nanobar = new Nanobar({
+        //     bg: '#44f',
+        //     target: div[0].childNodes[0]
+        // });
+        //grab all form data  
+        var formData = new FormData($(this)[0]);          
+        $.ajax({
+            url: "/mark-my-work",
+            type: 'POST',
+            data: formData,
+            async: false,
+            cache: false,
+            contentType: false,
+            processData: false,
+            success: function(data, status, request) {
+                r = request.responseJSON['answers'];
+            alert(r);
+            //   status_url = request.responseJSON['messages']
+            //   update_progress(status_url, nanobar, div[0]);
+            //   $('#myModal').modal('toggle');
+            }, error: function() {
+                alert('Unexpected error');
+            }});
+    });
+
+    function update_progress(status_url, nanobar, status_div) {
+        // send GET request to status URL
+        $.getJSON(status_url, function(data) {
+            // update UI
+            percent = parseInt(data['current'] * 100 / data['total']);
+            nanobar.go(percent);
+            $(status_div.childNodes[1]).text(percent + '%');
+            $(status_div.childNodes[2]).text(data['status']);
+            if (data['state'] != 'PENDING' && data['state'] != 'PROGRESS') {
+                if ('result' in data) {
+                    console.log(data['result'])
+                    // show result
+                    $('#latest-lint').html(data['result']);
+                    $(status_div.childNodes[3]).text('Result: ' + data['result']);
+                }
+                else {
+                    // something unexpected happened
+                    $(status_div.childNodes[3]).text('Result: ' + data['state']);
+                }
+            }
+            else {
+                // rerun in 2 seconds
+                setTimeout(function() {
+                    update_progress(status_url, nanobar, status_div);
+                }, 2000);
+            }
+        });
+    }
+    var pageContent = {{course_material|tojson}};
+    function changeText(idElement) {
+        key = 'session_'+String(idElement)
+        $('#main-div').html(pageContent[key]);
+    }
+  </script>
+{% endblock %}
