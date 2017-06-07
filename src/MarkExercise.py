@@ -4,13 +4,14 @@ import sys
 import subprocess
 import importlib
 from dotenv import load_dotenv
+from timeout import timeout
 
 dotenv_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '.env'))
 load_dotenv(dotenv_path)
 PYTHON_EXE = os.environ.get('PYTHON_EXE')
 
 
-def check_answers(test_file, q_name, q_id):
+def check_console(test_file, q_name, q_id):
 
     proc = subprocess.Popen(['C:\\Python27\\python.exe', '-u', os.path.abspath(os.path.join(os.path.dirname(__file__), '..', test_file))], stdout=subprocess.PIPE)
     answers = [666, 42]
@@ -36,7 +37,20 @@ def check_answers(test_file, q_name, q_id):
     return {'q_id': q_id, 'question_name': q_name,'answers': anss, 'status': status,'results':results, 'messages':messages}
 
 
-def call_functions_in_file(file_path, fname):
+def check_functions(file_path, function_name, q_id):
 
-    MyClass = getattr(importlib.import_module('src.uploads.{0}'.format(file_path)), fname)
-    instance = MyClass()
+    filename = os.path.basename(file_path).split('.')[0]
+    function = getattr(importlib.import_module('uploads.{0}'.format(filename)), function_name)
+    status = 'Successful!'
+    results = 'hallo'
+    anss = 0
+    messages = ['uhoh', 'sas']
+
+    func = timeout(timeout=1)(function)
+    try:
+        messages = func()
+    except Exception as e:
+        messages = e.message
+
+    return {'q_id': q_id, 'question_name': function_name,'answers': anss, 'status': status,'results':results, 'messages':messages}
+
