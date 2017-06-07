@@ -1,5 +1,5 @@
 # MarkerBot
-Automates python assignment marking for https://github.com/tomvalorsa/python-course
+Automates python assignment marking for https://github.com/ArupAus/lunchtimepython
 
 
 # Developer Installation Instructions

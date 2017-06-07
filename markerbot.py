@@ -37,25 +37,25 @@ Markdown(app, extensions=extentions)
 
 questions = [
     [
-    'Rounding Numbers',
-    'Greetings',
-    'FizzBuzz',
-    'Double Char',
-    'Sum'],
+    ('Rounding Numbers', 'qid_1'),
+    ('Greetings', 'qid_2'),
+    ('FizzBuzz', 'qid_3'),
+    ('Double Char', 'qid_4'),
+    ('Sum', 'qid_5')],
     [
-    'Strings',
-    'Print a Triangle',
-    'Prime Numbers'],
+    ('Strings', 'qid_6'),
+    ('Print a Triangle', 'qid_7'),
+    ('Prime Numbers', 'qid_8')],
     [
-    'Data Analysis',
-    'Square Check',
-    'Append Check',
-    'Into The Wild'],
+    ('Data Analysis', 'qid_9'),
+    ('Square Check', 'qid_10'),
+    ('Append Check', 'qid_11'),
+    ('Into The Wild', 'qid_12')],
     [
-    'Evaluating Lines',
-    'Tails',
-    'Personable Greg',
-    'Chasing outstanding debts'
+    ('Evaluating Lines', 'qid_13'),
+    ('Tails', 'qid_14'),
+    ('Personable Greg', 'qid_15'),
+    ('Chasing outstanding debts', 'qid_16')
     ]
 ]
 
@@ -96,11 +96,12 @@ def submit_file_for_marking():
         filename = secure_filename(file.filename)
         now = datetime.now()
         question_name = request.form['q_name']
+        q_id = request.form['q_id']
         filename = os.path.join(app.config['UPLOAD_FOLDER'],
                                 '%s.%s' % (now.strftime('p%Y_%m_%d_%H_%M_%S_%f'),
                                 file.filename.rsplit('.', 1)[1]))
         file.save(filename)
-        return jsonify(check_answers(filename, question_name))
+        return jsonify(check_answers(filename, question_name, q_id))
     return 'wow how did you get here?'
 
 @app.errorhandler(404)
