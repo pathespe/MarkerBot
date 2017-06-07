@@ -9,7 +9,7 @@ import requests
 import json
 import markdown
 
-from src.MarkExercise import check_answers
+from src.MarkExercise import check_console, check_functions
 ALLOWED_EXTENSIONS = set(['txt', 'py'])
 
 dotenv_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '.env'))
@@ -22,6 +22,7 @@ app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024 # 2 mb files which should be plenty
 app.secret_key = SECRET_KEY
 extentions = ['markdown.extensions.extra',
+              'markdown.extensions.toc',
               'sane_lists',
               'codehilite',
               'admonition',
@@ -33,7 +34,6 @@ extentions = ['markdown.extensions.extra',
               'wikilinks']
 
 Markdown(app, extensions=extentions)
-
 
 questions = [
     [
@@ -58,6 +58,7 @@ questions = [
     ('Chasing outstanding debts', 'qid_16')
     ]
 ]
+function_questions = ['qid_1']
 
 def allowed_filetypes(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -84,24 +85,30 @@ def submit_file_for_marking():
     if 'file' not in request.files:
         return jsonify({"success":'No file'})
 
-    file = request.files['file']
+    recieved_file = request.files['file']
 
     # if user does not select file, browser also
     # submit a empty part without filename
-    if file.filename == '':
+    if recieved_file.filename == '':
         return jsonify({"success":'No selected file'})
 
     # if request makes sense
-    if file and allowed_filetypes(file.filename):
-        filename = secure_filename(file.filename)
+    if recieved_file and allowed_filetypes(recieved_file.filename):
+        filename = secure_filename(recieved_file.filename)
         now = datetime.now()
         question_name = request.form['q_name']
         q_id = request.form['q_id']
         filename = os.path.join(app.config['UPLOAD_FOLDER'],
                                 '%s.%s' % (now.strftime('p%Y_%m_%d_%H_%M_%S_%f'),
-                                file.filename.rsplit('.', 1)[1]))
-        file.save(filename)
-        return jsonify(check_answers(filename, question_name, q_id))
+                                recieved_file.filename.rsplit('.', 1)[1]))
+        recieved_file.save(filename)
+
+        if q_id in function_questions:
+            results = check_functions(filename, 'break_ur_markerbot', q_id)
+        else:
+            results = check_console(filename, question_name, q_id)
+        return jsonify(results)
+
     return 'wow how did you get here?'
 
 @app.errorhandler(404)

@@ -20,7 +20,7 @@ frm.submit(function (ev) {
             question_name = request.responseJSON['question_name'];
             q_id = request.responseJSON['q_id'];
             $('#modalConent').html(
-                '<div><h3>Results</h3>'+ messages[0] + messages[1]+'</div>'+
+                '<div><h3>Results</h3>'+ messages+'</div>'+
                 '<div><h3>Overall Result</h3>'+status+'</p></div>'
                 );
             $('#myModalLabel').html('<h1>'+question_name+'</h1>');
