@@ -10,9 +10,9 @@ from flask_script import Manager
 
 _, app = mb.run_setup()
 
-# dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
-# load_dotenv(dotenv_path)
-# app.config.from_object(os.environ['APP_SETTINGS'])
+dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
+load_dotenv(dotenv_path)
+app.config.from_object(os.environ['APP_SETTINGS'])
 
 migrate = Migrate(app, db)
 manager = Manager(app)

@@ -96,5 +96,5 @@ def deploy_pspace(zip_location, owner, project, email):
     path_list = path_list[wdir:]
 
     # _, url = s3_send('{0}.{1}'.format(directory, 'zip'), '{0}.{1}'.format(os.path.basename(directory), 'zip'))
-    pspace_url = '{0}/{1}/{2}/{3}'.format('http://localhost:8888/parameterspace/', path_list[0], path_list[1], path_list[2])
+    pspace_url = '{0}/{1}/{2}/{3}'.format('http://127.0.0.1:5000/markerbot', path_list[0], path_list[1], path_list[2])
     send_email_from_arup(owner, email, project, pspace_url)

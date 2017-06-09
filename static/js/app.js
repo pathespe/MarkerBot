@@ -11,7 +11,7 @@ $(document).ready(function() {
         audience: 'https://' + 'arupdigital.au.auth0.com' + '/userinfo',
         scope: 'openid profile',
         responseType: 'code',
-        redirectUri: 'https://YOUR_APP/callback'
+        redirectUri: 'http://127.0.0.1:5000/callback'
       });
     });
 });  

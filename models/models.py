@@ -1,7 +1,7 @@
 from sqlalchemy import ForeignKey
 from sqlalchemy.dialects.postgresql import JSON
-from markerbot import db
 import datetime
+from markerbot import db
 
 
 class Question(db.Model):
@@ -44,18 +44,13 @@ class User(db.Model):
 class Result(db.Model):
     """project model"""
 
-    RESULT_TYPES = [
-        (u'correct', _(u'Correct')),
-        (u'incorrect', _(u'Incorrect')),
-        (u'partial-mark', _(u'Partial mark'))
-    ]
     __tablename__ = 'results'
     __table_args__ = {'extend_existing': True}
     id = db.Column(db.Integer, primary_key=True)
     created_date = db.Column(db.DateTime(), default=datetime.datetime.utcnow)
     user = db.Column(db.Integer, ForeignKey(User.id))
     question = db.Column(db.Integer, ForeignKey(Question.id))
-    submission_result = db.Column(db.ChoiceType(RESULT_TYPES))
+    submission_result = db.Column(db.Boolean)
 
     def __init__(self, owner, question, submission_result):
         self.owner = owner
