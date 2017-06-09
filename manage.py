@@ -3,16 +3,16 @@ import os
 
 from dotenv import load_dotenv
 
-import parameterspace as pspace
-from parameterspace import db
+import markerbot as mb
+from markerbot import db
 from flask_migrate import Migrate, MigrateCommand
 from flask_script import Manager
 
-_, app = pspace.run_setup()
-# dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
-# load_dotenv(dotenv_path)
+_, app = mb.run_setup()
 
-# app.config.from_object(os.environ['APP_SETTINGS'])
+dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
+load_dotenv(dotenv_path)
+app.config.from_object(os.environ['APP_SETTINGS'])
 
 migrate = Migrate(app, db)
 manager = Manager(app)

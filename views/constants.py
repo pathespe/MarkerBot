@@ -1,0 +1,2 @@
+CODE_KEY = 'code'
+PROFILE_KEY = 'PROFILE_KEY'

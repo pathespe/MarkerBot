@@ -13,7 +13,7 @@ PYTHON_EXE = os.environ.get('PYTHON_EXE')
 
 def check_console(test_file, q_name, q_id):
 
-    proc = subprocess.Popen(['C:\\Python27\\python.exe', '-u', os.path.abspath(os.path.join(os.path.dirname(__file__), '..', test_file))], stdout=subprocess.PIPE)
+    proc = subprocess.Popen([PYTHON_EXE, '-u', os.path.abspath(os.path.join(os.path.dirname(__file__), '..', test_file))], stdout=subprocess.PIPE)
     answers = [666, 42]
     results = []
     messages = []
