@@ -11,10 +11,9 @@ load_dotenv(dotenv_path)
 PYTHON_EXE = os.environ.get('PYTHON_EXE')
 
 
-def check_console(test_file, q_name, q_id):
+def check_console(test_file, q_name, answers):
 
     proc = subprocess.Popen([PYTHON_EXE, '-u', os.path.abspath(os.path.join(os.path.dirname(__file__), '..', test_file))], stdout=subprocess.PIPE)
-    answers = [666, 42]
     results = []
     messages = []
     status  = 'Successful!'
@@ -37,7 +36,7 @@ def check_console(test_file, q_name, q_id):
     return {'q_id': q_id, 'question_name': q_name,'answers': anss, 'status': status,'results':results, 'messages':messages}
 
 
-def check_functions(file_path, function_name, q_id):
+def check_functions(file_path, function_name, answers):
 
     filename = os.path.basename(file_path).split('.')[0]
     function = getattr(importlib.import_module('uploads.{0}'.format(filename)), function_name)
@@ -52,5 +51,4 @@ def check_functions(file_path, function_name, q_id):
     except Exception as e:
         messages = e.message
 
-    return {'q_id': q_id, 'question_name': function_name,'answers': anss, 'status': status,'results':results, 'messages':messages}
-
+    return {'q_id': q_id, 'status': status,'results':results, 'messages':messages}

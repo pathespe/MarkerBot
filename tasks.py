@@ -5,10 +5,10 @@ import smtplib
 import zipfile
 import shutil
 
-from cloud import s3_send
+from util.Cloud import s3_send
 from email.mime.text import MIMEText
-from parameterspace import celery
-from createThumbs import create_thumbnails
+from markerbot import celery
+from marker.MarkExercise import check_functions, check_console
 
 
 def copy(src, dest):
@@ -30,24 +30,25 @@ def del_files_in_dir(folder):
             print(e)
 
 
-def send_email_from_arup(recipient, email, project, pspace_url):
+def send_reminder_emailp(recipient, email, question, url):
     """send email from within arup"""
 
     server = smtplib.SMTP('ausmtp01.arup.com')
     email_content = """<html>
                        <head></head>
                        <body>
-                       <p>Gday {0},</p>
-                       <p>Your ParamaterSpace for  project {1}
+                       <p>Hey {0},</p>
+                       <p>Learning to program takes time but what you put in now will save you time in the long run.
+                       why not try your hand at {1}
                        <a href="{3}">here!</a></p>
                        <p>Regards,</p>
-                       <p>SpamBot</p>
+                       <p>Lunchtime Python Team</p>
                        </body>
-                       </html><hr>{3}""".format(recipient, email, project, pspace_url)
+                       </html><hr>{3}""".format(recipient, email, question, url)
 
     # Create a text/plain message
     msg = MIMEText(email_content.encode('ascii', 'replace'), 'html', 'ascii')
-    msg['Subject'] = project
+    msg['Subject'] = 'Its been a while...'
     msg['From'] = email
     msg['To'] = email
     # Send the message via our own SMTP server
@@ -55,46 +56,41 @@ def send_email_from_arup(recipient, email, project, pspace_url):
     server.quit()
 
 
-@celery.task(name='tasks.deploy')
-def deploy_pspace(zip_location, owner, project, email):
+@celery.task(name='tasks.check_function_task')
+def check_function_task(file_path, q_id):
     """task that will deply a site"""
-    # unzip files
-    zip_filepath, _ = os.path.splitext(zip_location)
-    zip_ref = zipfile.ZipFile(zip_location, 'r')
-    zip_ref.extractall(zip_filepath)
-    zip_ref.close()
+    # query DB for question and get info required
 
-    # copy files from viewer to working_dir
-    root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'viewer'))
+    function_name = ''
+    answers = 42
 
-    for item in os.listdir(root):
-        copy(os.path.join(root, item), os.path.join(zip_filepath, item))
+    return check_functions(file_path, function_name, answers)
 
-    # delete files in image directory
-    del_files_in_dir(os.path.join(zip_filepath, 'images'))
-    del_files_in_dir(os.path.join(zip_filepath, 'data'))
 
-    # copy files into appropriate folders
-    for item in os.listdir(zip_filepath):
-        if item.lower().endswith('.png'):
-            copy(os.path.join(zip_filepath, item),
-                 os.path.join(zip_filepath, 'images', item))
-        elif item.lower().endswith('.csv') or item.lower().endswith('.js'):
-            copy(os.path.join(zip_filepath, item),
-                 os.path.join(zip_filepath, 'data', item))
+@celery.task(name='tasks.check_console_task')
+def check_console_task(test_file, q_id):
+    """task that will run python in a separate process and parse stdout"""
+    # query DB for question and get info required
+    q_name = ''
+    answers = 42
+    return check_console(test_file, q_name, answers)
 
-    # copy files into appropriate folders
-    for item in os.listdir(zip_filepath):
-        if item.lower().endswith('.png') or item.lower().endswith('.js') or item.lower().endswith('.csv'):
-            os.remove(os.path.join(zip_filepath, item))
 
-    # create thumbnails
-    create_thumbnails(os.path.join(zip_filepath, 'images'), os.path.join(zip_filepath, 'images'))
-    path_list = zip_filepath.split('\\')
+@celery.task(name='tasks.spam_users')
+def spam_users(file_path, function_name, q_id, answers):
+    # hassle users that have stopped logging in and completing questions...?
+    # could check for last attempt in results table if its been over 
+    # 2 weeks send them an email saying we miss you try this question
+    # send_reminder_emailp(recipient, email, question, url)
+    pass
 
-    wdir = path_list.index('working_dir')
-    path_list = path_list[wdir:]
+@celery.task(name='tasks.clean_up')
+def clean_up(file_path, function_name, q_id, answers):
+    """task that will clean up uploads directory, run once a day?"""
+    pass
 
-    # _, url = s3_send('{0}.{1}'.format(directory, 'zip'), '{0}.{1}'.format(os.path.basename(directory), 'zip'))
-    pspace_url = '{0}/{1}/{2}/{3}'.format('http://127.0.0.1:5000/markerbot', path_list[0], path_list[1], path_list[2])
-    send_email_from_arup(owner, email, project, pspace_url)
+
+@celery.task(name='tasks.check_question_set')
+def check_question_set(file_path, function_name, q_id, answers):
+    """task that will check for new questions"""
+    pass
