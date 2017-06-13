@@ -15,6 +15,7 @@ frm.submit(function (ev) {
         contentType: false,
         processData: false,
         success: function(data, status, request) {
+            console.log(request);
             status = request.responseJSON['status'];
             messages = request.responseJSON['messages'];
             question_name = request.responseJSON['question_name'];
@@ -39,13 +40,4 @@ frm.submit(function (ev) {
 function changeText(idElement) {
     key = 'session_'+String(idElement)
     $('#main-div').html(pageContent[key]);
-}
-
-// document.getElementById("").onclick = changeText(e);
-// $(".expander").click(function(event) {
-//     key = 'session_'+String(idElement)
-//     myFunc(event, 1, 2, 3);
-// });
-function changeResultStatus(){
-
 }

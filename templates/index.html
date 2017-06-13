@@ -33,7 +33,6 @@
                         <tr>
                             <th>Question</th>
                             <th>File</th>
-                            <th> </th>
                             <th>Result</th>
                         </tr>
                         </thead>
@@ -52,8 +51,8 @@
                                         <button  class="btn btn-primary" id="upload-file-btn"  type="submit">Submit</button>
                                     </fieldset>
                                 </td>
-                                <input name='q_name' type="hidden" value="{{q[0]}}">
-                                <input name='q_id' type="hidden" value="{{q[1]}}">
+                                <input name='q_name' type="hidden" value="{{q.name}}">
+                                <input name='q_id' type="hidden" value="{{q.id}}">
                             </form>
                             <td><div id="{{q[1]}}"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span></div></td>
                         </tr>
@@ -67,25 +66,19 @@
     <div id="main-div" class="col-md-8">
         {{readme|markdown}} 
     </div>
-    <div id="cheat-div" style="display:'none';"  class="col-md-8">
-        {{cheatsheet|markdown}} 
-    </div>
+
 {% endblock %}
 {% block scripts %}
 <script>
-    $("#cheat-div").toggle();
     var pageContent = {{course_material|tojson}};
-    var cheat = 
+    var cheat = {{cheatsheet|tojson}};
     function changeText(idElement) {
         key = 'session_'+String(idElement)
         $('#main-div').html(pageContent[key]);
         $('#cheat-div').hide();
     }
-
-    $( "#button" ).click(function() {
-        $('#cheat-div').toggle();
-        $("#main-div").toggle();
-
+    $("#button").click(function() {
+        $('#main-div').html(cheat['cheat']);
     });
 </script>
 {% endblock %}

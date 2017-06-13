@@ -4,10 +4,11 @@ import os
 import smtplib
 import zipfile
 import shutil
+import pickle
 
 from util.Cloud import s3_send
 from email.mime.text import MIMEText
-from markerbot import celery
+from markerbot import celery, db
 from marker.MarkExercise import check_functions, check_console
 
 
@@ -30,7 +31,7 @@ def del_files_in_dir(folder):
             print(e)
 
 
-def send_reminder_emailp(recipient, email, question, url):
+def send_reminder_email(recipient, email, question, url):
     """send email from within arup"""
 
     server = smtplib.SMTP('ausmtp01.arup.com')
@@ -57,40 +58,42 @@ def send_reminder_emailp(recipient, email, question, url):
 
 
 @celery.task(name='tasks.check_function_task')
-def check_function_task(file_path, q_id):
+def check_function_task(file_path, function_name, args, answers, timeout):
     """task that will deply a site"""
-    # query DB for question and get info required
+    results = []
 
-    function_name = ''
-    answers = 42
+    for i, arg in enumerate(args):
+        results.append(check_functions(file_path,
+                                       function_name,
+                                       arg,
+                                       answers[i]))
 
-    return check_functions(file_path, function_name, answers)
+    return results
 
-
-@celery.task(name='tasks.check_console_task')
-def check_console_task(test_file, q_id):
-    """task that will run python in a separate process and parse stdout"""
-    # query DB for question and get info required
-    q_name = ''
-    answers = 42
-    return check_console(test_file, q_name, answers)
-
-
-@celery.task(name='tasks.spam_users')
-def spam_users(file_path, function_name, q_id, answers):
-    # hassle users that have stopped logging in and completing questions...?
-    # could check for last attempt in results table if its been over 
-    # 2 weeks send them an email saying we miss you try this question
-    # send_reminder_emailp(recipient, email, question, url)
-    pass
-
-@celery.task(name='tasks.clean_up')
-def clean_up(file_path, function_name, q_id, answers):
-    """task that will clean up uploads directory, run once a day?"""
-    pass
+# @celery.task(name='tasks.check_console_task')
+# def check_console_task(test_file, q_id):
+#     """task that will run python in a separate process and parse stdout"""
+#     # query DB for question and get info required
+#     q_name = ''
+#     answers = 42
+#     return check_console(test_file, q_name, answers)
 
 
-@celery.task(name='tasks.check_question_set')
-def check_question_set(file_path, function_name, q_id, answers):
-    """task that will check for new questions"""
-    pass
+# @celery.task(name='tasks.spam_users')
+# def spam_users(file_path, function_name, q_id, answers):
+#     # hassle users that have stopped logging in and completing questions...?
+#     # could check for last attempt in results table if its been over 
+#     # 2 weeks send them an email saying we miss you try this question
+#     # send_reminder_emailp(recipient, email, question, url)
+#     pass
+
+# @celery.task(name='tasks.clean_up')
+# def clean_up(file_path, function_name, q_id, answers):
+#     """task that will clean up uploads directory, run once a day?"""
+#     pass
+
+
+# @celery.task(name='tasks.check_question_set')
+# def check_question_set(file_path, function_name, q_id, answers):
+#     """task that will check for new questions"""
+#     pass

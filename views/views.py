@@ -14,7 +14,7 @@ import markdown
 from email.utils import parseaddr
 
 from models.models import Question, User, Result
-from tasks import check_function_task, check_console_task
+from tasks import check_function_task
 from constants import CODE_KEY, PROFILE_KEY, EXTENTIONS
 
 from markerbot import db
@@ -70,7 +70,7 @@ def index():
                            user=session['profile'], 
                            questions=questions,
                            readme=course_readme,
-                           cheatsheet=cheat_sheet,
+                           cheatsheet={'cheat': markdown.markdown(cheat_sheet, extensions=EXTENTIONS)},
                            course_material=course_material_json)
 
 
@@ -97,6 +97,7 @@ def splash():
 @index_view.route("/mark-my-work", methods=['POST'])
 def submit_file_for_marking():
 
+    # return 'hallo'
     # check if the post request has the file part
     if 'file' not in request.files:
         return jsonify({"success":'No file'})
@@ -114,15 +115,19 @@ def submit_file_for_marking():
         now = datetime.now()
         question_name = request.form['q_name']
         q_id = request.form['q_id']
+        # return q_id
         filename = os.path.join(os.getenv('UPLOAD_FOLDER'),
                                 '%s.%s' % (now.strftime('p%Y_%m_%d_%H_%M_%S_%f'),
                                 recieved_file.filename.rsplit('.', 1)[1]))
         recieved_file.save(filename)
+        question = db.session.query(Question).filter_by(id=q_id).first()
+        # return question
+        results = check_function_task.delay(filename,
+                                            question.function_name,
+                                            question.args,
+                                            question.answer,
+                                            question.timeout)
 
-        if q_id in ['q_id']:
-            results = check_function_task.delay(filename, 'break_ur_markerbot', q_id)
-        else:
-            results = check_console_task.delay(filename, question_name, q_id)
         return jsonify(results)
 
     return 'wow how did you get here?'

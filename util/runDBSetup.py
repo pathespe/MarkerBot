@@ -33,12 +33,16 @@ def grab_questions(sessions, verify):
         for question in resp:
             questions.append(Question(name=question['name'],
                                       question=question['question'],
+                                      function_name=question['function_name'],
                                       answer=question['answers'],
                                       args = question['args'],
                                       timeout=question['timeout'],
                                       session=sess_no))
     return questions
 
-question_set = grab_questions([1, 2], True)
-db.session.add_all(question_set)
+# question_set = grab_questions([1, 2], True)
+# db.session.add_all(question_set)
+
+q = db.session.query(Question).filter_by(id=1).first()
+print q.name
 db.session.commit()

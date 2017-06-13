@@ -10,15 +10,17 @@ class Question(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String())
     question = db.Column(db.String())
+    function_name = db.Column(db.String())
     session = db.Column(db.Integer())
     args = db.Column(db.PickleType())
     answer = db.Column(db.PickleType())
     timeout = db.Column(db.Float())
     created_date = db.Column(db.DateTime(), default=datetime.datetime.utcnow)
 
-    def __init__(self, name, question, args, answer, timeout, session):
+    def __init__(self, name, question, function_name, args, answer, timeout, session):
         self.name = name
         self.question = question
+        self.function_name = function_name
         self.answer = answer
         self.session = session
         self.args = args

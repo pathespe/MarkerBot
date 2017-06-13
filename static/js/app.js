@@ -1,17 +1,22 @@
 $(document).ready(function() {
   var auth = new auth0.WebAuth({
-    domain: 'arupdigital.au.auth0.com',
-    clientID: 'xXpLrCXjZL4Almq312RFRVP3ElIcUOU0'
-   });
+    domain: AUTH0_DOMAIN,
+    clientID: AUTH0_CLIENT_ID,
+    theme: {
+     logo: '/static/img/WWlogo.svg'
+   },
+   languageDictionary: {
+     title: "python time"
+   }});
 
 
-    $('.btn-login').click(function(e) {
+    $('.b').click(function(e) {
       e.preventDefault();
       auth.authorize({
-        audience: 'https://' + 'arupdigital.au.auth0.com' + '/userinfo',
+        audience: 'https://' + AUTH0_DOMAIN + '/userinfo',
         scope: 'openid profile',
         responseType: 'code',
-        redirectUri: 'http://127.0.0.1:5000/callback'
+        redirectUri: AUTH0_CALLBACK_URL
       });
     });
 });  
