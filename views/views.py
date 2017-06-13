@@ -1,93 +1,57 @@
-from flask import request, render_template, redirect, session, Blueprint, jsonify
-from functools import wraps
-import requests
 import os
-import constants
-from os import environ as env
+from functools import wraps
 from urlparse import urlparse
-from models.models import Question, User, Result
+from datetime import datetime
+from flask import request, render_template, redirect, session, Blueprint, jsonify
+
+from werkzeug.utils import secure_filename
 from auth0.v3.authentication import GetToken
 from auth0.v3.authentication import Users
-from datetime import datetime
-from flaskext.markdown import Markdown
-from functools import wraps
-from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
+import requests
 import json
 import markdown
-from marker.MarkExercise import check_console, check_functions
-from dotenv import load_dotenv
+from email.utils import parseaddr
 
+from models.models import Question, User, Result
+from tasks import check_function_task
+from constants import CODE_KEY, PROFILE_KEY, EXTENTIONS
+
+from markerbot import db
 
 load_dotenv(os.path.join(os.path.dirname(__file__), '..',".env"))
 
 AUTH0_CALLBACK_URL = os.getenv('AUTH0_CALLBACK_URL')
-AUTH0_CLIENT_ID =  os.getenv('AUTH0_CLIENT_ID')
-AUTH0_CLIENT_SECRET =  os.getenv('AUTH0_CLIENT_SECRET')
+AUTH0_CLIENT_ID = os.getenv('AUTH0_CLIENT_ID')
+AUTH0_CLIENT_SECRET = os.getenv('AUTH0_CLIENT_SECRET')
 AUTH0_DOMAIN = os.getenv('AUTH0_DOMAIN')
-CODE_KEY = os.getenv('CODE_KEY')
-PROFILE_KEY = os.getenv('PROFILE_KEY')
 ALLOWED_EXTENSIONS = set(['txt', 'py'])
 ROOT_URL = os.environ.get('ROOT_URL')
 
-
-extentions = ['markdown.extensions.extra',
-              'markdown.extensions.toc',
-              'sane_lists',
-              'codehilite',
-              'admonition',
-              'meta',
-              'headerid',
-              'nl2br',
-              'smarty',
-              'toc',
-              'wikilinks']
-
-
-questions = [[
-    ('Rounding Numbers', 'qid_1'),
-    ('Greetings', 'qid_2'),
-    ('FizzBuzz', 'qid_3'),
-    ('Double Char', 'qid_4'),
-    ('Sum', 'qid_5')], [
-    ('Strings', 'qid_6'),
-    ('Print a Triangle', 'qid_7'),
-    ('Prime Numbers', 'qid_8')], [
-    ('Data Analysis', 'qid_9'),
-    ('Square Check', 'qid_10'),
-    ('Append Check', 'qid_11'),
-    ('Into The Wild', 'qid_12')], [
-    ('Evaluating Lines', 'qid_13'),
-    ('Tails', 'qid_14'),
-    ('Personable Greg', 'qid_15'),
-    ('Chasing outstanding debts', 'qid_16')
-    ]
-]
-function_questions = ['qid_1']
-
+SESSIONS = [1, 2, 3, 4, 5, 6]
 
 index_view = Blueprint('index', __name__)
 
 # Requires authentication decorator
 def requires_auth(f):
-  @wraps(f)
-  def decorated(*args, **kwargs):
-    if 'profile' not in session:
-      # Redirect to Login page here
-      return redirect('/')
-    return f(*args, **kwargs)
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if 'profile' not in session:
+          # Redirect to Login page here
+            return redirect('/')
+        return f(*args, **kwargs)
 
-  return decorated
+    return decorated
 
 def allowed_filetypes(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def grab_latest_content():
     json_dict = {}
-    for i in range(1,5):
+    for i in SESSIONS:
         r = requests.get('{1}/Session{0}/session_{0}_problems.md'.format(i, ROOT_URL), verify=False).text
         key = 'session_{0}'.format(i)
-        json_dict[key] = markdown.markdown(r, extensions=extentions)
+        json_dict[key] = markdown.markdown(r, extensions=EXTENTIONS)
     return json_dict
 
 @index_view.route("/index")
@@ -95,7 +59,19 @@ def grab_latest_content():
 def index():
     course_readme = requests.get('{0}readme.md'.format(ROOT_URL), verify=False).text
     course_material_json = grab_latest_content()
-    return render_template('index.html',questions=questions, readme=course_readme, course_material=course_material_json)
+    cheat_sheet = requests.get('{0}/cheat_sheet.md'.format(ROOT_URL)).text
+    
+    questions = []
+    # there must be a better way to do this.. 
+    for i in SESSIONS:
+        questions.append(Question.query.filter(Question.session == i).all())
+    
+    return render_template('index.html',
+                           user=session['profile'], 
+                           questions=questions,
+                           readme=course_readme,
+                           cheatsheet={'cheat': markdown.markdown(cheat_sheet, extensions=EXTENTIONS)},
+                           course_material=course_material_json)
 
 
 @index_view.route('/logout')
@@ -109,18 +85,19 @@ def logout():
 
 @index_view.route('/')
 def splash():
+    """splash page when people arent logged in"""
     env = {
         'AUTH0_CLIENT_ID': AUTH0_CLIENT_ID,
         'AUTH0_DOMAIN': AUTH0_DOMAIN,
         'AUTH0_CALLBACK_URL': AUTH0_CALLBACK_URL
     }
-    # rq = random.choice(constants.QUOTES)
     return render_template('splash.html', env=env)
 
 
 @index_view.route("/mark-my-work", methods=['POST'])
 def submit_file_for_marking():
 
+    # return 'hallo'
     # check if the post request has the file part
     if 'file' not in request.files:
         return jsonify({"success":'No file'})
@@ -138,60 +115,63 @@ def submit_file_for_marking():
         now = datetime.now()
         question_name = request.form['q_name']
         q_id = request.form['q_id']
+        # return q_id
         filename = os.path.join(os.getenv('UPLOAD_FOLDER'),
                                 '%s.%s' % (now.strftime('p%Y_%m_%d_%H_%M_%S_%f'),
                                 recieved_file.filename.rsplit('.', 1)[1]))
         recieved_file.save(filename)
+        question = db.session.query(Question).filter_by(id=q_id).first()
+        # return question
+        results = check_function_task.delay(filename,
+                                            question.function_name,
+                                            question.args,
+                                            question.answer,
+                                            question.timeout)
 
-        if q_id in function_questions:
-            results = check_functions(filename, 'break_ur_markerbot', q_id)
-        else:
-            results = check_console(filename, question_name, q_id)
         return jsonify(results)
 
     return 'wow how did you get here?'
 
 @index_view.errorhandler(404)
 def page_not_found(e):
+    # log exception
     return render_template('404.html'), 404
 
 @index_view.route('/callback')
 def callback_handling():
 
-    code = request.args.get(constants.CODE_KEY)
+    code = request.args.get(CODE_KEY)
     get_token = GetToken(AUTH0_DOMAIN)
     auth0_users = Users(AUTH0_DOMAIN)
     token = get_token.authorization_code(AUTH0_CLIENT_ID,
                                          AUTH0_CLIENT_SECRET, code, AUTH0_CALLBACK_URL)
     user_info = auth0_users.userinfo(token['access_token'])
-    session[constants.PROFILE_KEY] = json.loads(user_info)
+    session[PROFILE_KEY] = json.loads(user_info)
+    # return user_info
+    # extract data to register user on DB in order top track question set progress
+    first_name = session['profile']['given_name']
+    surname = session['profile']['family_name']
+    try:
+        email = session['profile']['email']
+    except Exception as e:
+        # log exception arup waad has email in nickname for some reason...
+
+        email = session['profile']['nickname']
+        if len(parseaddr(email)[1]) == 0:
+            return 'unable to log you in, invalid email supplied'
+
+    user = db.session.query(User).filter_by(first_name=first_name,
+                                            surname=surname,
+                                            email=email).first()
+
+    # if user doesnt exist in db, add them
+    if(user is None):
+        user = User(first_name=first_name,
+                    surname=surname,
+                    email=email)
+        db.session.add(user)
+        db.session.commit()
+
+    # add user id from DB to the session
+    session['user_id'] = user.id
     return redirect('/index')
-
-
-    # trying to keep a reference in the session to who the user is
-    # not sure if the way ive done it below is a good idea..
-    # user_info = requests.get(u_url).json()
-    # session[constants.PROFILE_KEY] = user_info
-
-    # first_name = user_info['given_name']
-    # surname = user_info['family_name']
-    # email = user_info['email']
-    # try:
-    #     company = ''.join(email.split('@')[1].split('.')[:-1])
-    # except:
-    #     company = 'Not Implemented'
-
-    # from models.models import User
-    # from wind_whisperer import db
-    # user = db.session.query(User).filter_by(first_name=first_name,
-    #                                                surname=surname,
-    #                                                email=email).first()
-
-    # if(user is None):
-    #     user = User(first_name=first_name,
-    #                        surname=surname,
-    #                        email=email,
-    #                        company=company)
-    #     db.session.add(user)
-    #     db.session.commit()
-    # session['user_id'] = user.id

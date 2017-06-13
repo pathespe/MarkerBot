@@ -2,24 +2,24 @@
 {% block content %}
 
     <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-        <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title" id="myModalLabel"></h4>
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel"></h4>
+            </div>
+            <div id="modalConent" class="modal-body">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+            </div>
         </div>
-        <div id="modalConent" class="modal-body">
-        </div>
-        <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        </div>
-        </div>
-    </div>
     </div>
 
     <div class = "col-md-4">
-                <div class="panel-group" id="accordion">
-    {% for question in questions %}
+        <div class="panel-group" id="accordion">
+            {% for question in questions %}
             <div class="panel panel-default">
                 <div class="panel-heading">
                 <h4 class="panel-title">
@@ -33,7 +33,6 @@
                         <tr>
                             <th>Question</th>
                             <th>File</th>
-                            <th> </th>
                             <th>Result</th>
                         </tr>
                         </thead>
@@ -41,7 +40,7 @@
                         {% for q in question %}
                         <tr>
                             <form class="upload-file" method="post" enctype="multipart/form-data">
-                                <td>{{q[0]}}</td>
+                                <td>{{q.name}}</td>
                                 <td>
                                     <fieldset>
                                         <input name="file" type="file">
@@ -52,8 +51,8 @@
                                         <button  class="btn btn-primary" id="upload-file-btn"  type="submit">Submit</button>
                                     </fieldset>
                                 </td>
-                                <input name='q_name' type="hidden" value="{{q[0]}}">
-                                <input name='q_id' type="hidden" value="{{q[1]}}">
+                                <input name='q_name' type="hidden" value="{{q.name}}">
+                                <input name='q_id' type="hidden" value="{{q.id}}">
                             </form>
                             <td><div id="{{q[1]}}"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span></div></td>
                         </tr>
@@ -61,19 +60,25 @@
                     </table>
                 </div>
             </div>
-    {% endfor %}
+            {% endfor %}
         </div>
     </div>
-    <div id="main-div" class = "col-md-8">
+    <div id="main-div" class="col-md-8">
         {{readme|markdown}} 
     </div>
+
 {% endblock %}
 {% block scripts %}
 <script>
     var pageContent = {{course_material|tojson}};
+    var cheat = {{cheatsheet|tojson}};
     function changeText(idElement) {
         key = 'session_'+String(idElement)
         $('#main-div').html(pageContent[key]);
+        $('#cheat-div').hide();
     }
+    $("#button").click(function() {
+        $('#main-div').html(cheat['cheat']);
+    });
 </script>
 {% endblock %}

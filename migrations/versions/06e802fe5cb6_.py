@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 720cda789bc6
+Revision ID: 06e802fe5cb6
 Revises: 
-Create Date: 2017-06-08 14:40:20.600000
+Create Date: 2017-06-12 22:59:00.613000
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '720cda789bc6'
+revision = '06e802fe5cb6'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -22,8 +22,12 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(), nullable=True),
     sa.Column('question', sa.String(), nullable=True),
-    sa.Column('answer', sa.String(), nullable=True),
+    sa.Column('function_name', sa.String(), nullable=True),
+    sa.Column('session', sa.Integer(), nullable=True),
+    sa.Column('args', sa.PickleType(), nullable=True),
+    sa.Column('answer', sa.PickleType(), nullable=True),
     sa.Column('timeout', sa.Float(), nullable=True),
+    sa.Column('created_date', sa.DateTime(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('users',
@@ -44,26 +48,7 @@ def upgrade():
     sa.ForeignKeyConstraint(['user'], [u'users.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
-    # op.create_table('celery_tasksetmeta',
-    # sa.Column('id', sa.INTEGER(), autoincrement=False, nullable=False),
-    # sa.Column('taskset_id', sa.VARCHAR(length=255), autoincrement=False, nullable=True),
-    # sa.Column('result', postgresql.BYTEA(), autoincrement=False, nullable=True),
-    # sa.Column('date_done', postgresql.TIMESTAMP(), autoincrement=False, nullable=True),
-    # sa.PrimaryKeyConstraint('id', name=u'celery_tasksetmeta_pkey'),
-    # sa.UniqueConstraint('taskset_id', name=u'celery_tasksetmeta_taskset_id_key')
-    # )
-    # op.create_table('celery_taskmeta',
-    # sa.Column('id', sa.INTEGER(), autoincrement=False, nullable=False),
-    # sa.Column('task_id', sa.VARCHAR(length=255), autoincrement=False, nullable=True),
-    # sa.Column('status', sa.VARCHAR(length=50), autoincrement=False, nullable=True),
-    # sa.Column('result', postgresql.BYTEA(), autoincrement=False, nullable=True),
-    # sa.Column('date_done', postgresql.TIMESTAMP(), autoincrement=False, nullable=True),
-    # sa.Column('traceback', sa.TEXT(), autoincrement=False, nullable=True),
-    # sa.PrimaryKeyConstraint('id', name=u'celery_taskmeta_pkey'),
-    # sa.UniqueConstraint('task_id', name=u'celery_taskmeta_task_id_key')
-    # )
     # ### end Alembic commands ###
-
 
 
 def downgrade():

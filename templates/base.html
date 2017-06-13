@@ -1,33 +1,61 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+
     <title>Lunchtime Python</title>
+    <style>
+      * {
+        border-radius: 0 !important;
+      }
+    </style>
     </head>
     <body>
-<nav class="navbar navbar-inverse">
-  <div class="container-fluid">
-    <div class="navbar-header">
-      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
-      <a class="navbar-brand" href="">LP MARKERBOT 5000 beta v0.0.0</a>
-    </div>
-    <div class="collapse navbar-collapse" id="myNavbar">
-      <ul class="nav navbar-nav">
-      </ul>
-      <ul class="nav navbar-nav navbar-right">
-      </ul>
-    </div>
-  </div>
-</nav>
+      <nav class="navbar navbar-inverse">
+        <div class="container-fluid">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="">Lunchtime Python</a>
+          </div>
+          <div class="collapse navbar-collapse" id="myNavbar">
+            <ul class="nav navbar-nav">
+              <li><a id="button" href="#">Cheat Sheet</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+              <li><a>{{user['name']}}</a></li>
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="true"><img class="avatar" height="22" width="22" src="{{user['picture']}}"/></a>
+                <ul class="dropdown-menu">
+                  <li><a href="/logout">logout</a></li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
 
 {% block content %}{% endblock %}
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <script src="./static/js/markerbot.js"></script>
+ <hr style = 'background-color:#000000; border-width:0; color:#000000; height:1px; lineheight:0; display: inline-block; text-align: left; width:100%;'/>
+
+      <footer class="footer">
+        <div class="container">
+          <center>
+            <address>
+              lunchtimeprogramming.arup.io content is licensed under a MIT License.<br/>
+              <a href="https://github.com/ArupAus/lunchtimepython/blob/master/LICENSE">Terms of Service</a> |
+              <a href="https://github.com/pathespe/MarkerBot/issues">Report Issues here</a> | 
+             <a href="mailto:patrick.hespe@arup.com?Subject=Markerbot%20Issue" >Contact</a><br/>
+            </address>
+          </center>
+        </div>
+      </footer>
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+      <script src="./static/js/markerbot.js"></script>
     </body>
 
 {% block scripts %}

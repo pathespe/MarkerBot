@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import print_function
 import os
 
 from dotenv import load_dotenv
@@ -37,7 +38,7 @@ def list_routes():
         output.append(line)
 
     for line in sorted(output):
-        print line
+        print(line)
 
 
 if __name__ == '__main__':
