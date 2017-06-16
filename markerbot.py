@@ -9,11 +9,15 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from flask_celery import make_celery
 from flaskext.markdown import Markdown
-
+import urllib
 import config
 
 dotenv_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '.env'))
 load_dotenv(dotenv_path)
+
+AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
+AWS_REGION = os.environ.get('AWS_REGION')
 
 app = Flask(__name__, static_url_path='/static')
 app.config.from_object(os.environ['APP_SETTINGS'])
@@ -21,7 +25,11 @@ app.config['UPLOAD_FOLDER'] = os.getenv('UPLOAD_FOLDER')
 app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024 # 2 mb files which should be plenty
 app.secret_key = os.getenv('SECRET_KEY')
 app.config['CELERY_BACKEND'] = 'db+postgresql+psycopg2://localhost/markerbot'
-app.config['CELERY_BROKER_URL'] = 'amqp://localhost//'
+app.config['CELERY_BROKER_URL'] = 'sqs://%s:%s@' % (urllib.quote(AWS_ACCESS_KEY_ID, safe=''),
+                                                    urllib.quote(AWS_SECRET_ACCESS_KEY, safe=''))
+app.config['BROKER_TRANSPORT_OPTIONS'] = {'region': AWS_REGION,
+                                          'visibility_timeout': 43200,
+                                          'polling_interval': 3}
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy()
 celery = make_celery(app)

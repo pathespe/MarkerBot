@@ -5,12 +5,16 @@ import smtplib
 import zipfile
 import shutil
 import pickle
+from dotenv import load_dotenv
 
 from util.Cloud import s3_send
 from email.mime.text import MIMEText
 from markerbot import celery, db
 from marker.MarkExercise import check_functions, check_console
+from util.sesEmail import Email
 
+load_dotenv(".env")
+ARUP_SMTP_SERVER = os.environ.get('ARUP_SMTP_SERVER')
 
 def copy(src, dest):
     try:
@@ -31,24 +35,36 @@ def del_files_in_dir(folder):
             print(e)
 
 
+def email_content(recipient, question, url):
+    return """<html>
+                <head></head>
+                <body>
+                  <p>Hey {0},</p>
+                  <p>Learning to program takes time but what you put in now will save you time in the long run.
+                  why not try your hand at {1}
+                  <a href="{3}">here!</a></p>
+                  <p>Happy Coding,</p>
+                  <p>Lunchtime Python Team</p>
+                </body>
+              </html>""".format(recipient, question, url)
+
+
+def send_aws_email(recipient, email, question, url):
+    """send email using SES, need to update so it can send to anyone"""
+    content = email_content(recipient, question, url)
+    email = Email(to=email, subject='Its been a while...')
+    email.text(content)
+    email.html(content)
+    email.send()
+
+
 def send_reminder_email(recipient, email, question, url):
     """send email from within arup"""
-
-    server = smtplib.SMTP('ausmtp01.arup.com')
-    email_content = """<html>
-                       <head></head>
-                       <body>
-                       <p>Hey {0},</p>
-                       <p>Learning to program takes time but what you put in now will save you time in the long run.
-                       why not try your hand at {1}
-                       <a href="{3}">here!</a></p>
-                       <p>Regards,</p>
-                       <p>Lunchtime Python Team</p>
-                       </body>
-                       </html><hr>{3}""".format(recipient, email, question, url)
+    server = smtplib.SMTP(ARUP_SMTP_SERVER)
+    content = email_content(recipient, question, url)
 
     # Create a text/plain message
-    msg = MIMEText(email_content.encode('ascii', 'replace'), 'html', 'ascii')
+    msg = MIMEText(content.encode('ascii', 'replace'), 'html', 'ascii')
     msg['Subject'] = 'Its been a while...'
     msg['From'] = email
     msg['To'] = email
@@ -59,7 +75,7 @@ def send_reminder_email(recipient, email, question, url):
 
 @celery.task(name='tasks.check_function_task')
 def check_function_task(file_path, function_name, args, answers, timeout):
-    """task that will deply a site"""
+    """task that will check a submission"""
     results = []
 
     for i, arg in enumerate(args):
