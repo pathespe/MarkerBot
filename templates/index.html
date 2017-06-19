@@ -73,16 +73,5 @@
     var pageContent = {{course_material|tojson}};
     var cheat = {{cheatsheet|tojson}};
     var preWork = {{pre_work|tojson}};
-    function changeText(idElement) {
-        key = 'session_'+String(idElement)
-        $('#main-div').html(pageContent[key]);
-        $('#cheat-div').hide();
-    }
-    $("#button").click(function() {
-        $('#main-div').html(cheat['cheat']);
-    });
-    $("#prebutton").click(function() {
-        $('#main-div').html(preWork['pre_work']);
-    });
 </script>
 {% endblock %}
