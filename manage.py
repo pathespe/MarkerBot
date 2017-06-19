@@ -4,8 +4,8 @@ import os
 
 from dotenv import load_dotenv
 
-import markerbot as mb
-from markerbot import db
+import application as mb
+from application import db
 from flask_migrate import Migrate, MigrateCommand
 from flask_script import Manager
 

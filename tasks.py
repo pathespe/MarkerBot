@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 
 from util.Cloud import s3_send
 from email.mime.text import MIMEText
-from markerbot import celery, db
+from application import celery, db
 from marker.MarkExercise import check_functions, check_console
 from util.sesEmail import Email
 

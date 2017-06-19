@@ -1,6 +1,6 @@
 import datetime
 from sqlalchemy import ForeignKey
-from markerbot import db
+from application import db
 
 
 class Question(db.Model):
