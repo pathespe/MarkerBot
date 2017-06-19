@@ -41,3 +41,20 @@ function changeText(idElement) {
     key = 'session_'+String(idElement)
     $('#main-div').html(pageContent[key]);
 }
+
+function changeText(idElement) {
+    key = 'session_'+String(idElement)
+    $('#main-div').html(pageContent[key]);
+    Prism.highlightAll();
+    $('#cheat-div').hide();
+}
+
+$("#button").click(function() {
+    $('#main-div').html(cheat['cheat']);
+    Prism.highlightAll();
+});
+
+$("#prebutton").click(function() {
+    $('#main-div').html(preWork['pre_work']);
+    Prism.highlightAll();
+});
