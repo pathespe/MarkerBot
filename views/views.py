@@ -17,7 +17,7 @@ from models.models import Question, User, Result
 from tasks import check_function_task
 from constants import CODE_KEY, PROFILE_KEY, EXTENTIONS
 
-from markerbot import db
+from application import db
 
 load_dotenv(os.path.join(os.path.dirname(__file__), '..',".env"))
 
@@ -28,7 +28,7 @@ AUTH0_DOMAIN = os.getenv('AUTH0_DOMAIN')
 ALLOWED_EXTENSIONS = set(['txt', 'py'])
 ROOT_URL = os.environ.get('ROOT_URL')
 
-SESSIONS = [1, 2, 3, 4, 5, 6]
+SESSIONS = [0, 1, 2, 3, 4, 5, 6]
 
 index_view = Blueprint('index', __name__)
 
@@ -57,9 +57,10 @@ def grab_latest_content():
 @index_view.route("/index")
 @requires_auth
 def index():
+    pre_work = requests.get('https://raw.githubusercontent.com/ArupAus/lunchtimepython/2017/Session0/README.md', verify=False).text
     course_readme = requests.get('{0}readme.md'.format(ROOT_URL), verify=False).text
     course_material_json = grab_latest_content()
-    cheat_sheet = requests.get('{0}/cheat_sheet.md'.format(ROOT_URL)).text
+    cheat_sheet = requests.get('{0}cheat_sheet.md'.format(ROOT_URL)).text
     
     questions = []
     # there must be a better way to do this.. 
@@ -70,6 +71,7 @@ def index():
                            user=session['profile'], 
                            questions=questions,
                            readme=course_readme,
+                           pre_work = {'pre_work': markdown.markdown(pre_work, extensions=EXTENTIONS)},
                            cheatsheet={'cheat': markdown.markdown(cheat_sheet, extensions=EXTENTIONS)},
                            course_material=course_material_json)
 

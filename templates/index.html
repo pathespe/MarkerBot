@@ -23,11 +23,11 @@
             <div class="panel panel-default">
                 <div class="panel-heading">
                 <h4 class="panel-title">
-                    <a class='expander' onclick="javascript:changeText({{loop.index}});" data-toggle="collapse" data-parent="#accordion" href="#session{{loop.index}}">
-                    Session {{loop.index}}</a>
+                    <a class='expander' onclick="javascript:changeText({{loop.index - 1}});" data-toggle="collapse" data-parent="#accordion" href="#session{{loop.index - 1}}">
+                    Session {{loop.index - 1}}</a>
                 </h4>
                 </div>
-                <div id="session{{loop.index}}" class="panel-collapse collapse">
+                <div id="session{{loop.index - 1}}" class="panel-collapse collapse">
                     <table class="table table-hover" id="projects-list" >
                         <thead>
                         <tr>
@@ -72,6 +72,7 @@
 <script>
     var pageContent = {{course_material|tojson}};
     var cheat = {{cheatsheet|tojson}};
+    var preWork = {{pre_work|tojson}};
     function changeText(idElement) {
         key = 'session_'+String(idElement)
         $('#main-div').html(pageContent[key]);
@@ -79,6 +80,9 @@
     }
     $("#button").click(function() {
         $('#main-div').html(cheat['cheat']);
+    });
+    $("#prebutton").click(function() {
+        $('#main-div').html(preWork['pre_work']);
     });
 </script>
 {% endblock %}

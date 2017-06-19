@@ -15,12 +15,12 @@ ROOT_URL = os.environ.get('ROOT_URL')
 p2app = os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir)
 sys.path.append(p2app)
 
-import markerbot
+import application
 from models.models import Question
 
 
 
-db, app = markerbot.run_setup()
+db, app = application.run_setup()
 app.config.from_object(os.environ['APP_SETTINGS'])
 
 def grab_questions(sessions, verify):
@@ -44,5 +44,5 @@ def grab_questions(sessions, verify):
 # db.session.add_all(question_set)
 
 q = db.session.query(Question).filter_by(id=1).first()
-print q.name
+
 db.session.commit()
