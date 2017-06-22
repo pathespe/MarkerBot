@@ -14,7 +14,7 @@ import markdown
 from email.utils import parseaddr
 
 from models.models import Question, User, Result
-from tasks import check_function_task
+from celery_tasks import check_function_task
 from constants import CODE_KEY, PROFILE_KEY, EXTENTIONS
 
 from application import db
@@ -96,48 +96,11 @@ def splash():
     return render_template('splash.html', env=env)
 
 
-@index_view.route("/mark-my-work", methods=['POST'])
-def submit_file_for_marking():
-
-    # return 'hallo'
-    # check if the post request has the file part
-    if 'file' not in request.files:
-        return jsonify({"success":'No file'})
-
-    recieved_file = request.files['file']
-
-    # if user does not select file, browser also
-    # submit a empty part without filename
-    if recieved_file.filename == '':
-        return jsonify({"success":'No selected file'})
-
-    # if request makes sense
-    if recieved_file and allowed_filetypes(recieved_file.filename):
-        filename = secure_filename(recieved_file.filename)
-        now = datetime.now()
-        question_name = request.form['q_name']
-        q_id = request.form['q_id']
-        # return q_id
-        filename = os.path.join(os.getenv('UPLOAD_FOLDER'),
-                                '%s.%s' % (now.strftime('p%Y_%m_%d_%H_%M_%S_%f'),
-                                recieved_file.filename.rsplit('.', 1)[1]))
-        recieved_file.save(filename)
-        question = db.session.query(Question).filter_by(id=q_id).first()
-        # return question
-        results = check_function_task.delay(filename,
-                                            question.function_name,
-                                            question.args,
-                                            question.answer,
-                                            question.timeout)
-
-        return jsonify(results)
-
-    return 'wow how did you get here?'
-
 @index_view.errorhandler(404)
 def page_not_found(e):
     # log exception
     return render_template('404.html'), 404
+
 
 @index_view.route('/callback')
 def callback_handling():

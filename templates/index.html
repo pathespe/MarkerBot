@@ -54,13 +54,16 @@
                                 <input name='q_name' type="hidden" value="{{q.name}}">
                                 <input name='q_id' type="hidden" value="{{q.id}}">
                             </form>
-                            <td><div id="{{q[1]}}"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span></div></td>
+                            <td><div id="{{q.id}}"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span></div></td>
                         </tr>
                         {% endfor %}
+                        </tbody>
                     </table>
                 </div>
             </div>
             {% endfor %}
+        </div>
+        <div id="progress">
         </div>
     </div>
     <div id="main-div" class="col-md-8">

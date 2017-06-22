@@ -29,7 +29,8 @@ app.config['CELERY_BROKER_URL'] = 'sqs://%s:%s@' % (urllib.quote(AWS_ACCESS_KEY_
                                                     urllib.quote(AWS_SECRET_ACCESS_KEY, safe=''))
 app.config['BROKER_TRANSPORT_OPTIONS'] = {'region': AWS_REGION,
                                           'visibility_timeout': 43200,
-                                          'polling_interval': 3}
+                                          'polling_interval': 2,
+                                          'queue_name_prefix': 'celery-markerbot'}
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 
@@ -50,7 +51,9 @@ def make_celery(app):
 
 def run_setup():
     """ create app and register_blueprints"""
-    from views.views import index_view 
+    from views.views import index_view
+    from api.mark_work import mark_api
+
     extentions = ['markdown.extensions.extra',
                   'sane_lists', 'codehilite',
                   'admonition', 'meta',
@@ -58,7 +61,7 @@ def run_setup():
                   'smarty', 'toc',
                   'wikilinks']
     Markdown(app, extensions=extentions)
-
+    app.register_blueprint(mark_api.blueprint, url_prefix='/api')
     app.register_blueprint(index_view)
     db.app = app
     db.init_app(app)
