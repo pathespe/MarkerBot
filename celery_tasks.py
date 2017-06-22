@@ -73,20 +73,35 @@ def send_reminder_email(recipient, email, question, url):
     server.quit()
 
 
-@celery.task(name='tasks.check_function_task')
-def check_function_task(file_path, function_name, args, answers, timeout):
+@celery.task(bind=True, name='celery_tasks.check_function_task')
+def check_function_task(self, file_path, q_id, function_name, args, answers, timeout):
     """task that will check a submission"""
     results = []
-
+    total = len(args)
+    status = 'Unsucessful'
     for i, arg in enumerate(args):
         results.append(check_functions(file_path,
                                        function_name,
                                        arg,
-                                       answers[i]))
+                                       answers[i],
+                                       timeout))
 
-    return results
+        self.update_state(state='PROGRESS',
+                          meta={'current': i,
+                                'total': total,
+                                'status': 'hold on m8!'})
+    if all([x['result'] for x in results]):
+        status = 'Successful!'
 
-# @celery.task(name='tasks.check_console_task')
+    return {'question_name': function_name,
+            'current': i,
+            'q_id': q_id,
+            'total': total,
+            'status': status,
+            'result': results
+            }
+
+# @celery.task(name='celery_tasks.check_console_task')
 # def check_console_task(test_file, q_id):
 #     """task that will run python in a separate process and parse stdout"""
 #     # query DB for question and get info required
@@ -95,7 +110,7 @@ def check_function_task(file_path, function_name, args, answers, timeout):
 #     return check_console(test_file, q_name, answers)
 
 
-# @celery.task(name='tasks.spam_users')
+# @celery.task(name='celery_tasks.spam_users')
 # def spam_users(file_path, function_name, q_id, answers):
 #     # hassle users that have stopped logging in and completing questions...?
 #     # could check for last attempt in results table if its been over 
@@ -103,13 +118,13 @@ def check_function_task(file_path, function_name, args, answers, timeout):
 #     # send_reminder_emailp(recipient, email, question, url)
 #     pass
 
-# @celery.task(name='tasks.clean_up')
+# @celery.task(name='celery_tasks.clean_up')
 # def clean_up(file_path, function_name, q_id, answers):
 #     """task that will clean up uploads directory, run once a day?"""
 #     pass
 
 
-# @celery.task(name='tasks.check_question_set')
+# @celery.task(name='celery_tasks.check_question_set')
 # def check_question_set(file_path, function_name, q_id, answers):
 #     """task that will check for new questions"""
 #     pass
