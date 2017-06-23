@@ -18,6 +18,13 @@
     </div>
 
     <div class = "col-md-4">
+        <link href="https://fonts.googleapis.com/css?family=Raleway:400,300,600,800,900" rel="stylesheet" type="text/css">
+        <div id="marking" >
+            <div class="row">
+                <div id="container" class = "col-md-6"></div>
+                <div  class = "col-md-6"><div id="messages" style="text-align:center"><h3>ok lets do this!</h3></div></div>
+            </div>
+        </div>
         <div class="panel-group" id="accordion">
             {% for question in questions %}
             <div class="panel panel-default">
@@ -33,6 +40,7 @@
                         <tr>
                             <th>Question</th>
                             <th>File</th>
+                            <th></th>
                             <th>Result</th>
                         </tr>
                         </thead>
@@ -53,6 +61,7 @@
                                 </td>
                                 <input name='q_name' type="hidden" value="{{q.name}}">
                                 <input name='q_id' type="hidden" value="{{q.id}}">
+                                <input name='user_id' type="hidden" value="{{user_id}}">
                             </form>
                             <td><div id="{{q.id}}"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span></div></td>
                         </tr>
@@ -63,8 +72,8 @@
             </div>
             {% endfor %}
         </div>
-        <div id="progress">
-        </div>
+        <!--<div id="progress">
+        </div>-->
     </div>
     <div id="main-div" class="col-md-8">
         {{readme|markdown}} 
@@ -73,6 +82,8 @@
 {% endblock %}
 {% block scripts %}
 <script>
+    var user_id = {{user_id}};
+    // var user_progress = ;
     var pageContent = {{course_material|tojson}};
     var cheat = {{cheatsheet|tojson}};
     var preWork = {{pre_work|tojson}};

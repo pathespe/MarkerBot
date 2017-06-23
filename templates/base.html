@@ -9,6 +9,12 @@
         * {
           border-radius: 0 !important;
         }
+        #container {
+          margin: 20px;
+          width: 150px;
+          height: 150px;
+          /*position: relative;*/
+        }
       </style>
     </head>
     <body>
@@ -26,12 +32,15 @@
             <ul class="nav navbar-nav">
               <li><a id="prebutton" href="#">Get Set Up</a></li>
               <li><a id="button" href="#">Cheat Sheet</a></li>
+              <li><a id="leaderbutton" href="#">Leaderboard</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
               <li><a>{{user['name']}}</a></li>
               <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="true"><img class="avatar" height="22" width="22" src="{{user['picture']}}"/></a>
                 <ul class="dropdown-menu">
+                  <li><a id="your_progress" href="#">your progress</a></li>
+                  <li><a id="about" href="#">about</a></li>
                   <li><a href="/logout">logout</a></li>
                 </ul>
               </li>
@@ -56,6 +65,7 @@
         </div>
       </footer>
       <script src="./static/js/prism.js"></script>
+      <script src="./static/js/progressbar.min.js"></script>
       <script src="//cdnjs.cloudflare.com/ajax/libs/nanobar/0.2.1/nanobar.min.js"></script>
       <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
       <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>

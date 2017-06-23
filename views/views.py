@@ -28,7 +28,7 @@ AUTH0_DOMAIN = os.getenv('AUTH0_DOMAIN')
 ALLOWED_EXTENSIONS = set(['txt', 'py'])
 ROOT_URL = os.environ.get('ROOT_URL')
 
-SESSIONS = [0, 1, 2, 3, 4, 5, 6]
+SESSIONS = [0, 1, 2, 3, 4, 5, 6] # hmmmmmm dunno about this
 
 index_view = Blueprint('index', __name__)
 
@@ -49,7 +49,7 @@ def allowed_filetypes(filename):
 def grab_latest_content():
     json_dict = {}
     for i in SESSIONS:
-        r = requests.get('{1}/Session{0}/session_{0}_problems.md'.format(i, ROOT_URL), verify=False).text
+        r = requests.get('{1}/Session{0}/session_{0}_problems.md'.format(i, ROOT_URL)).text
         key = 'session_{0}'.format(i)
         json_dict[key] = markdown.markdown(r, extensions=EXTENTIONS)
     return json_dict
@@ -57,18 +57,19 @@ def grab_latest_content():
 @index_view.route("/index")
 @requires_auth
 def index():
-    pre_work = requests.get('https://raw.githubusercontent.com/ArupAus/lunchtimepython/2017/Session0/README.md', verify=False).text
-    course_readme = requests.get('{0}readme.md'.format(ROOT_URL), verify=False).text
+    pre_work = requests.get('https://raw.githubusercontent.com/ArupAus/lunchtimepython/2017/Session0/README.md').text
+    course_readme = requests.get('{0}readme.md'.format(ROOT_URL)).text
     course_material_json = grab_latest_content()
     cheat_sheet = requests.get('{0}cheat_sheet.md'.format(ROOT_URL)).text
-    
+
     questions = []
     # there must be a better way to do this.. 
     for i in SESSIONS:
         questions.append(Question.query.filter(Question.session == i).all())
-    
+
     return render_template('index.html',
-                           user=session['profile'], 
+                           user=session['profile'],
+                           user_id = session['user_id'],
                            questions=questions,
                            readme=course_readme,
                            pre_work = {'pre_work': markdown.markdown(pre_work, extensions=EXTENTIONS)},
