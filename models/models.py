@@ -58,10 +58,10 @@ class Result(db.Model):
     question = db.Column(db.Integer, ForeignKey(Question.id))
     submission_result = db.Column(db.Boolean)
 
-    def __init__(self, owner, question, submission_result):
-        self.owner = owner
+    def __init__(self, user, question, submission_result):
+        self.user = int(user)
         self.question = question
         self.submission_result = submission_result
 
     def __repr__(self):
-        return '<Result {0}, {1}, {2}>'.format(self.name, self.question, self.submission_result)
+        return '<Result {0}, {1}, {2}, User, {3}>'.format(self.id, self.question, self.submission_result, self.user)

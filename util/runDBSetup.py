@@ -9,6 +9,7 @@ import sys
 import json
 import requests
 from dotenv import load_dotenv
+from sqlalchemy import func
 load_dotenv(os.path.join(os.path.dirname(__file__), '..',".env"))
 
 ROOT_URL = os.environ.get('ROOT_URL')
@@ -16,7 +17,7 @@ p2app = os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir)
 sys.path.append(p2app)
 
 import application
-from models.models import Question
+from models.models import Question, User, Result
 
 
 
@@ -42,7 +43,26 @@ def grab_questions(sessions, verify):
 
 # question_set = grab_questions([1, 2], True)
 # db.session.add_all(question_set)
+# Result.query.filter(Result.user == user_id,
+# a = Result.query.filter(Result.submission_result == True).count()
+# q = db.session.query(Question).filter_by(id=1).first()
 
-q = db.session.query(Question).filter_by(id=1).first()
+
+
+
+
+
+a = db.session.query(Result).filter(Result.submission_result == True).distinct(Result.user).all().count()
+
+print a
+# out = {}
+# for result in a:
+#     if result.User.first_name not in out.keys():
+#         out[result.User.first_name] = 1
+#     else:
+#         out[result.User.first_name] += 1
+
+# print out
 
 db.session.commit()
+db.session.close()

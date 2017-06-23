@@ -75,5 +75,5 @@ run this script to update question set in DB
 
 # Starting celery task queue
 ```
-python -m celery -A tasks.celery worker --loglevel=info
+python -m celery -A celery_tasks.celery worker --loglevel=info
 ```
