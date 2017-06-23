@@ -245,9 +245,7 @@ $("#leaderbutton").click(function() {
             contentType: false,
             processData: false,
             success: function(request) {
-                status_url = request
-                console.log(request);
-                $('#modalConent').html(request);
+                $('#modalConent').html(unpack_ranking(request));
                 $('#myModalLabel').html('<h1>Leader Board</h1>');
                 $('#myModal').modal('show');
         }, error: function() {
@@ -255,6 +253,24 @@ $("#leaderbutton").click(function() {
         }});
 });
 
-$('.upload-file');
+function unpack_ranking(p){
+    var output = `<table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Questions Complete</th>
+                    </tr>
+                    </thead>
+                    <tbody>`;
+    for (var i= 0; i < p.length; i++){
+        output += '<tr><td>' + p[i][1]['user'] + 
+                   '</td><td> ' + p[i][1]['count'] + '</tr>'
+    }
+    return output + '</tbody></table>';
+}
+
+
+
+
 
    

@@ -41,28 +41,8 @@ def grab_questions(sessions, verify):
                                       session=sess_no))
     return questions
 
-# question_set = grab_questions([1, 2], True)
-# db.session.add_all(question_set)
-# Result.query.filter(Result.user == user_id,
-# a = Result.query.filter(Result.submission_result == True).count()
-# q = db.session.query(Question).filter_by(id=1).first()
-
-
-
-
-
-
-a = db.session.query(Result).filter(Result.submission_result == True).distinct(Result.user).all().count()
-
-print a
-# out = {}
-# for result in a:
-#     if result.User.first_name not in out.keys():
-#         out[result.User.first_name] = 1
-#     else:
-#         out[result.User.first_name] += 1
-
-# print out
+question_set = grab_questions([1, 2], True)
+db.session.add_all(question_set)
 
 db.session.commit()
 db.session.close()

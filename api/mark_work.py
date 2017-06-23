@@ -7,7 +7,7 @@ from flask_restful import Api, Resource, reqparse
 from celery_tasks import check_function_task
 import werkzeug 
 from application import db
-from models.models import Question, Result
+from models.models import Question, Result, User
 from datetime import datetime
 
 
@@ -133,24 +133,26 @@ class UserProgressAPI(Resource):
 
 @mark_api.resource('/rankings')
 class MarkRankingsAPI(Resource):
-    """allow client to view rankings"""
+    """allow client to view rankings, absolute mess atm"""
     @staticmethod
     def get():
 
+        # this needs to be refactored
+        a = db.session.query(Result, User).filter(Result.user == User.id)\
+            .filter(Result.submission_result == True).all()
 
-        # db.session.query(Result, User.id).join(User).filter(Result.submission_result == True).first()
+        from collections import OrderedDict
+        out = {}
+        for result in a:
+            if result.User.id not in out.keys():
+                out[result.User.id] = {'user': '{0} {1}'.format(result.User.first_name, result.User.surname),
+                                       'count': 1, 
+                                       'q_id': [result.Result.question] }
+                continue
+            if result.Result.question not in out[result.User.id]['q_id']:
+                out[result.User.id]['count'] += 1
+                out[result.User.id]['q_id'].append(result.Result.question)
 
+        ordered = list(sorted(out.items(), key=lambda i: (i[1]['count'], i[1]['user']),reverse=True))
 
-        # # reponse = {}
-        # # users = User.query.all()
-        # # for user in users:
-        # #     key = '{0} {1}'.format(user.first_name, user.surname)
-        # #     response[key] = len(Result.query.filter(Result.user == user.user_id,
-        # #                         Result.question == question.id).all())
-
-
-        # #     for qr in query_result:
-        # #         if qr.submission_result == True:
-        # #             q_result = True
-
-        return 'to be implemented'
+        return jsonify(ordered)
