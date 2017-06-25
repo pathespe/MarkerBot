@@ -153,6 +153,6 @@ class MarkRankingsAPI(Resource):
                 out[result.User.id]['count'] += 1
                 out[result.User.id]['q_id'].append(result.Result.question)
 
-        ordered = list(sorted(out.items(), key=lambda i: (i[1]['count'], i[1]['user']),reverse=True))
+        ordered = list(sorted(out.items(), key=lambda i: (i[1]['count'], i[1]['user']), reverse=True))
 
         return jsonify(ordered)
