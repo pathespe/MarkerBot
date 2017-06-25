@@ -1,7 +1,5 @@
-
 // hide div with progress bar on page load
 $("#marking").hide();
-
 
 // progressbar.js@1.0.0 version is used
 // Docs: http://progressbarjs.readthedocs.org/en/1.0.0/
@@ -113,7 +111,6 @@ function unpack_user_progress(user_progress){
     return output + '</tbody></table>';
 }
 
-
 function update_progress(status_url) {
     // send GET request to status URL
     $.getJSON(status_url, function(data) {
@@ -164,6 +161,31 @@ function update_progress(status_url) {
     });
 }
 
+function panel_ticks(){
+
+ $.ajax({
+        url: "/api/user-progress/" + user_id + "/",
+        type: 'GET',
+        async: false,
+        cache: false,
+        contentType: false,
+        processData: false,
+        success: function(user_progress) {
+            for (var i= 0; i < user_progress.length; i++){
+                var q_id = user_progress[i]['q_id'];
+                if(user_progress[i]['correct']){
+                    $('#' + q_id).html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>');
+                }else{
+                    $('#' + q_id).html('<span class="glyphicon glyphicon-minus" aria-hidden="true"></span>');
+                }
+            }
+        }, error: function() {
+            alert("oh shii");
+        }});
+}
+
+
+
 function changeText(idElement) {
     key = 'session_'+String(idElement)
     $('#main-div').html(pageContent[key]);
@@ -206,14 +228,21 @@ $("#your_progress").click(function() {
             $('#myModalLabel').html('<h1>Your Progress</h1>');
             $('#myModal').modal('show');
         }, error: function() {
-            alert("oh shii");
+            alert("Ah something bad happened, please report issue with events leading up to it at https://github.com/pathespe/MarkerBot/issues");
         }});
 });
 
 $("#about").click(function() {
     $('#modalConent').html(`
-    <h3>muchos gracias todos python maestros y amigos!</h3>
-    <p>In random.shuffle() order</p>
+    
+    <p>This course aims to upskill office workers so they can work smart not hard.
+    Computers are good at repetitive tasks so why not let them to the mundane while you
+    focus on overarching task at hand
+    </p>
+    <hr/>
+    <h3>Acknowledgements - muchos gracias todos python maestros y amigos!</h3>
+    
+    <p>In <code>random.shuffle()</code> order</p>
     <ul>
         <li>Tom Valorsa</li>
         <li>Ian MacKenzie</li>
@@ -228,9 +257,12 @@ $("#about").click(function() {
         <li>Patrick Hespe</li>
         <li>Tom Gasson</li>
     </ul>
+
+    <hr/>
+
+    <p><b>Lunchtime Markerbot</b> built with love, coffee and late nights by Patrick Hespe</p>
     
-    <p><b>Lunchtime Markerbot</b> (this site) built with love, plenty of face palms and late nights by Patrick Hespe</p>
-    <b>Big thanks to Arup Digital & Arup Uni for supporting this course</b>
+    <b>Big &#10084;	to Arup Digital & Arup Uni for supporting this course</b>
     `);
     $('#myModalLabel').html('<h1>About Lunchtime Programming</h1>');
     $('#myModal').modal('show');
@@ -254,23 +286,34 @@ $("#leaderbutton").click(function() {
 });
 
 function unpack_ranking(p){
+    var rank = 0;
     var output = `<table class="table table-hover">
                     <thead>
                     <tr>
+                        <th>Rank</th>
                         <th>User</th>
                         <th>Questions Complete</th>
                     </tr>
                     </thead>
                     <tbody>`;
+
+    var prev_count = -999;
     for (var i= 0; i < p.length; i++){
-        output += '<tr><td>' + p[i][1]['user'] + 
+        if (p[i][1]['count'] != prev_count){
+            rank = i +1;
+            prev_count = p[i][1]['count'];
+        }
+
+        output += '<tr><td>' + rank + 
+                   '</td><td>' + p[i][1]['user'] + 
                    '</td><td> ' + p[i][1]['count'] + '</tr>'
     }
-    return output + '</tbody></table>';
+
+    return output + `</tbody></table>
+                    <p>* Reverse Aplhabetical in case of a tie</p>
+                    <p>** Number of attempts not considered</p>`;
 }
 
-
-
-
-
-   
+$( document ).ready(function() {
+    panel_ticks();
+});

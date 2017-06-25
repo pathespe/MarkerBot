@@ -35,39 +35,41 @@
                 </h4>
                 </div>
                 <div id="session{{loop.index - 1}}" class="panel-collapse collapse">
-                    <table class="table table-hover" id="projects-list" >
-                        <thead>
-                        <tr>
-                            <th>Question</th>
-                            <th>File</th>
-                            <th></th>
-                            <th>Result</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {% for q in question %}
-                        <tr>
-                            <form class="upload-file" method="post" enctype="multipart/form-data">
-                                <td>{{q.name}}</td>
-                                <td>
-                                    <fieldset>
-                                        <input name="file" type="file">
-                                    </fieldset>
-                                </td>
-                                <td>
-                                    <fieldset>
-                                        <button  class="btn btn-primary" id="upload-file-btn"  type="submit">Submit</button>
-                                    </fieldset>
-                                </td>
-                                <input name='q_name' type="hidden" value="{{q.name}}">
-                                <input name='q_id' type="hidden" value="{{q.id}}">
-                                <input name='user_id' type="hidden" value="{{user_id}}">
-                            </form>
-                            <td><div id="{{q.id}}"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span></div></td>
-                        </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="projects-list" >
+                            <thead>
+                            <tr>
+                                <th>Question</th>
+                                <th>File</th>
+                                <th></th>
+                                <th>Result</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for q in question %}
+                            <tr>
+                                <form class="upload-file" method="post" enctype="multipart/form-data">
+                                    <td>{{q.name}}</td>
+                                    <td>
+                                        <fieldset>
+                                            <input name="file" type="file">
+                                        </fieldset>
+                                    </td>
+                                    <td>
+                                        <fieldset>
+                                            <button  class="btn btn-primary" id="upload-file-btn"  type="submit">Submit</button>
+                                        </fieldset>
+                                    </td>
+                                    <input name='q_name' type="hidden" value="{{q.name}}">
+                                    <input name='q_id' type="hidden" value="{{q.id}}">
+                                    <input name='user_id' type="hidden" value="{{user_id}}">
+                                </form>
+                                <td><div id="{{q.id}}"></div></td>
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
             {% endfor %}

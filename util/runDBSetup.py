@@ -9,7 +9,6 @@ import sys
 import json
 import requests
 from dotenv import load_dotenv
-from sqlalchemy import func
 load_dotenv(os.path.join(os.path.dirname(__file__), '..',".env"))
 
 ROOT_URL = os.environ.get('ROOT_URL')

@@ -5,14 +5,20 @@ import smtplib
 import zipfile
 import shutil
 import pickle
+
+from datetime import datetime
 from dotenv import load_dotenv
 from util.Cloud import s3_send
 from email.mime.text import MIMEText
+
 from application import celery
 from marker.MarkExercise import check_functions, check_console
 from util.sesEmail import Email
+from util.DBUtilities import connect
 from models.models import Result
-load_dotenv(".env")
+
+
+load_dotenv(os.path.abspath(os.path.join(os.path.dirname(__file__), '.env')))
 ARUP_SMTP_SERVER = os.environ.get('ARUP_SMTP_SERVER')
 
 
@@ -40,8 +46,9 @@ def email_content(recipient, question, url):
                 <head></head>
                 <body>
                   <p>Hey {0},</p>
-                  <p>Learning to program takes time but what you put in now will save you time in the long run.
-                  why not try your hand at {1}
+                  <p>Learning to program takes time but what you put in now
+                     will save you time in the long run.
+                     why not try your hand at {1}
                   <a href="{3}">here!</a></p>
                   <p>Happy Coding,</p>
                   <p>Lunchtime Python Team</p>
@@ -76,12 +83,11 @@ def send_reminder_email(recipient, email, question, url):
 @celery.task(bind=True, name='celery_tasks.check_function_task')
 def check_function_task(self, file_path, user_id, q_id, function_name, args, answers, timeout):
     """task that will check a submission"""
-    import application as mb
-    db, _ = mb.run_setup()
+
     results = []
     total = len(args)
     status = 'Unsucessful'
-    sub_result = Result(int(user_id), q_id, False)
+    sub_result = False
     for i, arg in enumerate(args):
         results.append(check_functions(file_path,
                                        function_name,
@@ -96,10 +102,14 @@ def check_function_task(self, file_path, user_id, q_id, function_name, args, ans
 
     if all([x['result'] for x in results]):
         status = 'Successful!'
-        sub_result = Result(int(user_id), q_id, True)
+        sub_result = True
 
-    db.session.add(sub_result)
-    db.session.commit()
+    con, meta = connect()
+    con.execute(meta.tables['results'].insert().values(user=int(user_id),
+                                                       question=q_id,
+                                                       submission_result=sub_result,
+                                                       created_date=datetime.now()))
+    con.dispose()
 
     return {'question_name': function_name,
             'current': i,
@@ -108,6 +118,7 @@ def check_function_task(self, file_path, user_id, q_id, function_name, args, ans
             'status': status,
             'result': results
             }
+
 
 # @celery.task(name='celery_tasks.check_console_task')
 # def check_console_task(test_file, q_id):
