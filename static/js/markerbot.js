@@ -1,7 +1,5 @@
-
 // hide div with progress bar on page load
 $("#marking").hide();
-
 
 // progressbar.js@1.0.0 version is used
 // Docs: http://progressbarjs.readthedocs.org/en/1.0.0/
@@ -112,7 +110,6 @@ function unpack_user_progress(user_progress){
     }
     return output + '</tbody></table>';
 }
-
 
 function update_progress(status_url) {
     // send GET request to status URL
@@ -231,7 +228,7 @@ $("#your_progress").click(function() {
             $('#myModalLabel').html('<h1>Your Progress</h1>');
             $('#myModal').modal('show');
         }, error: function() {
-            alert("oh shii");
+            alert("Ah something bad happened, please report issue with events leading up to it at https://github.com/pathespe/MarkerBot/issues");
         }});
 });
 

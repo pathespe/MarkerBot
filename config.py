@@ -45,3 +45,4 @@ class TestingConfig(Config):
     TESTING = True
     CSRF_ENABLED = True
     PRESERVE_CONTEXT_ON_EXCEPTION = False
+    CELERY_BROKER_URL = 'amqp://localhost//'

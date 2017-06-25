@@ -14,6 +14,7 @@ import application
 db, app = application.run_setup()
 from models.models import Result, User, Question
 
+
 def grab_questions(sessions, verify):
     """queries github pages for questions"""
     questions = []
@@ -36,7 +37,30 @@ class TestMarker(unittest.TestCase):
     def setUp(self):
         pass
 
-    def check_session1():
+    def test_marker(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+class TestViews(unittest.TestCase):
+
+    def setUp(self):
+        pass
+
+    # def test_mocked_session(self):
+    #      with app.test_client() as c:
+    #         with c.session_transaction() as sess:
+    #             sess['user_id'] = 1 
+    #             rv = c.get('api/user-progress/{0}/'.format(sess['user_id']))
+    #             assert(rv.status_code == 200)
+
+    def test_auth(self):
+        with app.test_client() as c:
+            rv = c.get('/index')
+            assert(rv.status_code == 302)
+
+    def test_404(self):
         pass
 
     def tearDown(self):
@@ -53,7 +77,8 @@ class TestApi(unittest.TestCase):
     def populate_db(self):
 
         users = []
-        with open(os.path.join(os.path.dirname(__file__), 'resources', 'users.csv')) as users_csv:
+        with open(os.path.join(os.path.dirname(__file__),
+                  'resources', 'users.csv')) as users_csv:
             for user in users_csv:
                 split_parts = user.split(',')
                 users.append(User(split_parts[0],
@@ -67,7 +92,8 @@ class TestApi(unittest.TestCase):
         db.session.commit()
 
         results = []
-        with open(os.path.join(os.path.dirname(__file__), 'resources','results.csv')) as results_csv:
+        with open(os.path.join(os.path.dirname(__file__),
+                  'resources','results.csv')) as results_csv:
             for result in results_csv:
                 split_parts = result.split(',')
                 results.append(Result(int(split_parts[0]),
@@ -84,12 +110,27 @@ class TestApi(unittest.TestCase):
         query = db.session.query(Result).all()
         assert(len(query) == 853)
 
-    # def check_rankings():
-    #     assert(create_JSON(answers, results, messages) == 200)
+    def test_user_progress(self):
+        with app.test_client() as client:
+            rv = client.get('api/user-progress/1')
+            assert(rv.status_code == 301)
+
+    def test_rankings(self):
+        with app.test_client() as client:
+            rv = client.post('api/rankings')
+            assert(rv.status_code == 405)
+            rv = client.get('api/rankings')
+            assert(rv.status_code == 200)
+
+    def test_mark_work(self):
+        with app.test_client() as client:
+            rv = client.post('api/mark-my-work')
+            assert(rv.status_code == 400)
+            rv = client.get('api/mark-my-work')
+            assert(rv.status_code == 405)
 
     def tearDown(self):
         db.session.close()
-
 
 
 if __name__ == '__main__':
