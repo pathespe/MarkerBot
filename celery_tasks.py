@@ -21,6 +21,7 @@ from models.models import Result
 load_dotenv(os.path.abspath(os.path.join(os.path.dirname(__file__), '.env')))
 ARUP_SMTP_SERVER = os.environ.get('ARUP_SMTP_SERVER')
 
+QUESTIONS_WTIH_FILES=[19, 20, 21, 22, 23]
 
 def copy(src, dest):
     try:
@@ -89,6 +90,11 @@ def check_function_task(self, file_path, user_id, q_id, function_name, args, ans
     status = 'Unsucessful'
     sub_result = False
     for i, arg in enumerate(args):
+        if q_id in QUESTIONS_WTIH_FILES:
+            if type(arg) == list:
+                arg[0] = os.path.join('tests', 'resources', arg[0])
+            else:
+                arg = os.path.join('tests', 'resources', arg)
         results.append(check_functions(file_path,
                                        function_name,
                                        arg,

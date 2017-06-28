@@ -76,21 +76,23 @@ frm.submit(function (ev) {
 });
 
 function unpack_result(results){
-    var output = `<table class="table table-hover">
+    var output = `<div class="table-responsive"><table class="table table-hover">
                     <thead>
                     <tr>
                         <th>Input</th>
                         <th>Output</th>
+                        <th>Expected</th>
                         <th>Result</th>
                     </tr>
                     </thead>
                     <tbody>`;
     for (var i= 0; i < results.length; i++){
         output += '<tr><td>' + results[i]['input'] + 
-                   '</td><td> ' + results[i]['output'] + 
+                   '</td><td> ' + JSON.stringify(results[i]['output']) +
+                   '</td><td> ' + JSON.stringify(results[i]['expected']) +   
                    '<td> ' + results[i]['result'] + '<td/></tr>'
     }
-    return output + '</tbody></table>';
+    return output + '</tbody></table></div';
 }
 
 function unpack_user_progress(user_progress){
@@ -234,35 +236,29 @@ $("#your_progress").click(function() {
 
 $("#about").click(function() {
     $('#modalConent').html(`
-    
-    <p>This course aims to upskill office workers so they can work smart not hard.
-    Computers are good at repetitive tasks so why not let them to the mundane while you
-    focus on overarching task at hand
-    </p>
+    <p>The lunchtime programming courses were started in 2016 in the Arup Sydney office by Alex Smith and Patrick Hespe.</p></br>
+    <p>The course aim isn't to turn everyone into software engineers, but to upskill Arup employees so they can work smarter not harder.
+    Our view is that computers are good at repetitive tasks so why not let them to the mundane, while you focus on overarching task at hand.</p>
+    <br/><p> We hope you end up loving writing programs to remove tedious tasks from your day to day too.</p>
     <hr/>
-    <h3>Acknowledgements - muchos gracias todos python maestros y amigos!</h3>
-    
-    <p>In <code>random.shuffle()</code> order</p>
+    <h3>Acknowledgements</h3>
+    <p><b>Big &#10084; to Arup Digital & Arup Uni for supporting this course</b>
+    and a special mention to the tutors, content writers and friends of the course
+    without whom it wouldn't have been possible. So muchos gracias to the following in <code>random.shuffle()</code> order:</p>
     <ul>
         <li>Tom Valorsa</li>
+        <li>Sam Diamond</li>
         <li>Ian MacKenzie</li>
         <li>Ben Harrison</li>
-        <li>Sam Diamond</li>
+        <li>Ben Brannon</li>
         <li>Kim Sherwin</li>
         <li>Selma Parris</li>
         <li>Penny Maber</li>
-        <li>Alex Smith</li>
         <li>Oliver Lock</li>
-        <li>Ben Branson</li>
-        <li>Patrick Hespe</li>
         <li>Tom Gasson</li>
     </ul>
-
     <hr/>
-
-    <p><b>Lunchtime Markerbot</b> built with love, coffee and late nights by Patrick Hespe</p>
-    
-    <b>Big &#10084;	to Arup Digital & Arup Uni for supporting this course</b>
+    <p>This <b>Lunchtime Markerbot</b> aka this site built with coffee, late nights and love by Patrick Hespe</p>
     `);
     $('#myModalLabel').html('<h1>About Lunchtime Programming</h1>');
     $('#myModal').modal('show');

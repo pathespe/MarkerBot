@@ -40,7 +40,7 @@ def grab_questions(sessions, verify):
                                       session=sess_no))
     return questions
 
-question_set = grab_questions([1, 2], True)
+question_set = grab_questions([0,1,2,3,4], True)
 db.session.add_all(question_set)
 
 db.session.commit()

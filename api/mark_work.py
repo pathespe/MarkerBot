@@ -51,6 +51,7 @@ class MarkWork(Resource):
                                 recieved_file.filename.rsplit('.', 1)[1]))
 
         recieved_file.save(filename)
+        print_divide_py3(filename)
         question = db.session.query(Question).filter_by(id=q_id).first()
         task = check_function_task.apply_async(args=[filename,
                                                      user_id,
@@ -61,6 +62,18 @@ class MarkWork(Resource):
                                                      question.timeout])
 
         return {'Location': url_for('mark_api.markpollapi', task_id=task.id)}
+
+
+def print_divide_py3(filepath):
+    lines =[]
+    with open(filepath, 'r') as f_in:
+        lines = f_in.readlines()
+
+    with open(filepath, 'w') as f_out:
+        f_out.write('from __future__ import print_function\n')
+        f_out.write('from __future__ import division\n\n')
+        for line in lines:
+            f_out.write(line)
 
 
 @mark_api.resource('/marking-poll/<task_id>')
