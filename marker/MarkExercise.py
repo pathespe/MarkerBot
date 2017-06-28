@@ -39,20 +39,16 @@ def check_console(test_file, q_name, args, answers):
 def check_functions(file_path, function_name, args, answers, time_out):
 
     result = False
-
     try:
         filename = os.path.basename(file_path).split('.')[0]
         function = getattr(importlib.import_module('uploads.{0}'.format(filename)), function_name)
         func = timeout(timeout=time_out)(function)
-
         if len(args) == 0:
             ans = func()
         else:
             ans = func(*args)
         if [ans] == answers:
-            # print ans, answers
             result = True
         return {'input': args, 'result': result, 'output': ans, 'expected': answers}
-
     except Exception as e:
-        return {'input': args, 'result': result, 'output': e.message}
+        return {'input': args, 'result': result, 'output': e.message, 'expected': answers}
