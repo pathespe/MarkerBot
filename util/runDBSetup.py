@@ -29,6 +29,7 @@ def grab_questions(sessions, verify):
     for sess_no in sessions:
         url = '{1}Session{0}/session_{0}_problems.json'.format(sess_no, ROOT_URL)
         resp = requests.get(url, verify=verify).text
+        print resp
         resp = json.loads(resp)
         for question in resp:
             questions.append(Question(name=question['name'],

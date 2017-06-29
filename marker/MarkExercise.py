@@ -49,6 +49,8 @@ def check_functions(file_path, function_name, args, answers, time_out):
             ans = func(*args)
         if [ans] == answers:
             result = True
+            print [ans]
+            print answers
         return {'input': args, 'result': result, 'output': ans, 'expected': answers}
     except Exception as e:
         return {'input': args, 'result': result, 'output': e.message, 'expected': answers}
