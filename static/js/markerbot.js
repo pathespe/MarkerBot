@@ -1,6 +1,9 @@
 // hide div with progress bar on page load
-$("#marking").hide();
+$(document).ready(function() {
+    $("#marking").hide();
+    $('#myModal').modal({ show: false});
 
+});
 // progressbar.js@1.0.0 version is used
 // Docs: http://progressbarjs.readthedocs.org/en/1.0.0/
 var bar = new ProgressBar.Circle(container, {
@@ -47,7 +50,6 @@ var bar = new ProgressBar.Circle(container, {
 bar.text.style.fontFamily = '"Raleway", Helvetica, sans-serif';
 bar.text.style.fontSize = '2rem';
 
-$('#myModal').modal({ show: false});
 
 var frm = $('.upload-file');
 
@@ -69,23 +71,12 @@ frm.submit(function (ev) {
             bar.animate(0.01);
             update_progress(status_url);
         }, error: function() {
-            alert(`oh no! Something went wrong with you submission,
-                  please check you have named you file and function
-                  correctly and try again`);
+            alert("oh no! Something went wrong with you submission, please check you have named you file and function correctly and try again");
         }});
 });
 
 function unpack_result(results){
-    var output = `<div class="table-responsive"><table class="table table-hover">
-                    <thead>
-                    <tr>
-                        <th>Input</th>
-                        <th>Output</th>
-                        <th>Expected</th>
-                        <th>Result</th>
-                    </tr>
-                    </thead>
-                    <tbody>`;
+    var output = '<div class="table-responsive"><table class="table table-hover"><thead><tr>th>Input</th><th>Output</th><th>Expected</th><th>Result</th></tr></thead><tbody>';
     for (var i= 0; i < results.length; i++){
         output += '<tr><td>' + results[i]['input'] + 
                    '</td><td> ' + JSON.stringify(results[i]['output']) +
@@ -96,15 +87,7 @@ function unpack_result(results){
 }
 
 function unpack_user_progress(user_progress){
-    var output = `<table class="table table-hover">
-                    <thead>
-                    <tr>
-                        <th>Question</th>
-                        <th>Attempts</th>
-                        <th>Complete</th>
-                    </tr>
-                    </thead>
-                    <tbody>`;
+    var output = '<table class="table table-hover"><thead><tr><th>Question</th><th>Attempts</th><th>Complete</th></tr></thead><tbody>';
     for (var i= 0; i < user_progress.length; i++){
         output += '<tr><td>' + user_progress[i]['q_name'] + 
                    '</td><td> ' + user_progress[i]['attempts'] + 
@@ -235,31 +218,7 @@ $("#your_progress").click(function() {
 });
 
 $("#about").click(function() {
-    $('#modalConent').html(`
-    <p>The lunchtime programming courses were started in 2016 in the Arup Sydney office by Alex Smith and Patrick Hespe.</p></br>
-    <p>The course aim isn't to turn everyone into software engineers, but to upskill Arup employees so they can work smarter not harder.
-    Our view is that computers are good at repetitive tasks so why not let them to the mundane, while you focus on overarching task at hand.</p>
-    <br/><p> We hope you end up loving writing programs to remove tedious tasks from your day to day too.</p>
-    <hr/>
-    <h3>Acknowledgements</h3>
-    <p><b>Big &#10084; to Arup Digital & Arup Uni for supporting this course</b>
-    and a special mention to the tutors, content writers and friends of the course
-    without whom it wouldn't have been possible. So muchos gracias to the following in <code>random.shuffle()</code> order:</p>
-    <ul>
-        <li>Tom Valorsa</li>
-        <li>Sam Diamond</li>
-        <li>Ian MacKenzie</li>
-        <li>Ben Harrison</li>
-        <li>Ben Brannon</li>
-        <li>Kim Sherwin</li>
-        <li>Selma Parris</li>
-        <li>Penny Maber</li>
-        <li>Oliver Lock</li>
-        <li>Tom Gasson</li>
-    </ul>
-    <hr/>
-    <p>This <b>Lunchtime Markerbot</b> aka this site built with coffee, late nights and love by Patrick Hespe</p>
-    `);
+    $('#modalConent').html("<p>The lunchtime programming courses were started in 2016 in the Arup Sydney office by Alex Smith and Patrick Hespe.</p></br><p>The course aim isn't to turn everyone into software engineers, but to upskill Arup employees so they can work smarter not harder.Our view is that computers are good at repetitive tasks so why not let them to the mundane, while you focus on overarching task at hand.</p><br/><p> We hope you end up loving writing programs to remove tedious tasks from your day to day too.</p><hr/><h3>Acknowledgements</h3><p><b>Big &#10084; to Arup Digital & Arup Uni for supporting this course</b>and a special mention to the tutors, content writers and friends of the coursewithout whom it wouldn't have been possible. So muchos gracias to the following in <code>random.shuffle()</code> order:</p><ul><li>Tom Valorsa</li><li>Sam Diamond</li><li>Ian MacKenzie</li><li>Ben Harrison</li><li>Ben Brannon</li><li>Kim Sherwin</li><li>Selma Parris</li><li>Penny Maber</li><li>Oliver Lock</li><li>Tom Gasson</li></ul><hr/><p>This <b>Lunchtime Markerbot</b> aka this site built with coffee, late nights and love by Patrick Hespe</p>");
     $('#myModalLabel').html('<h1>About Lunchtime Programming</h1>');
     $('#myModal').modal('show');
 });
@@ -283,15 +242,7 @@ $("#leaderbutton").click(function() {
 
 function unpack_ranking(p){
     var rank = 0;
-    var output = `<table class="table table-hover">
-                    <thead>
-                    <tr>
-                        <th>Rank</th>
-                        <th>User</th>
-                        <th>Questions Complete</th>
-                    </tr>
-                    </thead>
-                    <tbody>`;
+    var output = "<table class='table table-hover'><thead><tr><th>Rank</th><th>User</th><th>Questions Complete</th></tr></thead><tbody>";
 
     var prev_count = -999;
     for (var i= 0; i < p.length; i++){
@@ -305,9 +256,7 @@ function unpack_ranking(p){
                    '</td><td> ' + p[i][1]['count'] + '</tr>'
     }
 
-    return output + `</tbody></table>
-                    <p>* Reverse Aplhabetical in case of a tie</p>
-                    <p>** Number of attempts not considered</p>`;
+    return output + "</tbody></table><p>* Reverse Aplhabetical in case of a tie</p><p>** Number of attempts not considered</p>";
 }
 
 $( document ).ready(function() {
