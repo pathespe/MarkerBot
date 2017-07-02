@@ -75,6 +75,7 @@ def print_divide_py3(filepath):
         for line in lines:
             f_out.write(line)
 
+    return filepath, True
 
 @mark_api.resource('/marking-poll/<task_id>')
 class MarkPollAPI(Resource):
