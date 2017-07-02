@@ -6,6 +6,7 @@ python:
 install: "pip install -r requirements.txt"
 install: "pip install coveralls"
 install: "pip install nose2"
+install: "pip install coverage"
 # command to run tests
 
 before_script:
