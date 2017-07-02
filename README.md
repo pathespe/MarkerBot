@@ -1,5 +1,6 @@
 # MarkerBot
 [![Build Status](https://travis-ci.org/pathespe/MarkerBot.svg?branch=master)](https://travis-ci.org/pathespe/MarkerBot)
+[![Coverage Status](https://coveralls.io/repos/github/pathespe/MarkerBot/badge.svg?branch=master)](https://coveralls.io/github/pathespe/MarkerBot?branch=master)
 
 Automates python assignment marking for https://github.com/ArupAus/lunchtimepython similar to Hackerrank but on a much smaller scale and tailor to the question sets in the course.
 
