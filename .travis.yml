@@ -6,7 +6,7 @@ install: "pip install -r requirements.txt"
 # command to run tests
 
 before_script:
-  - psql -c 'create database travis_ci_test;' -U postgres
+  - psql -c 'create database markerbot;' -U postgres
 script: python manage.py db init
 script: python manage.py db migrate
 script: python manage.py db upgrade
