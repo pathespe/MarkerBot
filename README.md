@@ -1,20 +1,54 @@
 # MarkerBot
-Automates python assignment marking for https://github.com/ArupAus/lunchtimepython
+[![Build Status](https://travis-ci.org/pathespe/MarkerBot.svg?branch=master)](https://travis-ci.org/pathespe/MarkerBot)
+[![Coverage Status](https://coveralls.io/repos/github/pathespe/MarkerBot/badge.svg?branch=master)](https://coveralls.io/github/pathespe/MarkerBot?branch=master)
+
+Automates python assignment marking for https://github.com/ArupAus/lunchtimepython similar to Hackerrank but on a much smaller scale and tailor to the question sets in the course.
+
+# How it Works
+
+1. User will authenticate against Arup servers using Auth0.
+
+2. Once logged in the site will fetch content from the [lunchtime python repo](https://github.com/ArupAus/lunchtimepython )
+
+3. Participant submits a file and this request is handled through ajax in markerbot.js
+
+4. The flask api recieves request saves the file upload and places a task in the DB, it will then return a polling url which the web
+
+5. Client will begin to poll api for task progress every 2 seconds
+
+6. A celery worker will pick up the task from the db when it becomes available, its progress is updated during execution and reflected back on the web client ui in the form of a progress bar.
+
+7. User gets useful feedback on how their submission went
+
+```
+                       +-------------------+                         +-------------------+
+          +----------> |     Web Server    +-----------------------> |      Database     |
+          |            |      (aws-eb)     |                         | (aws-rds)postgres |
+          |            +-------------------+                         +-------------------+
+          |                                                                     |
+          |                                                                     |
++---------+------------------+                         +-------------------+    |
+|          Browser           |                         | Background Worker | <--+
+|lunchtimeprogramming.arup.io|                         |  (celery/aws-sqs) |
++----------------------------+                         +-------------------+
+
+```
 
 
-# Developer Installation Instructions
+# Developer Instructions
 
+Install Dependencies:
 ```
 $ pip install -r requirements.txt --trusted-host pypi.python.org
 ```
 
-# Database Setup
+## Database Setup
 Install [postgresql 9.6](https://www.postgresql.org/download/) if you don't already have it
 
 Then create a DB for development/testing
 ```
 $ psql -U postgres template1
-# create database MarkerBot;
+# create database markerbot;
 CREATE DATABASE
 # \q
 ```
@@ -40,16 +74,19 @@ and then you can run..
 `python manage.py db upgrade`
 you should now have a DB with the latest schema
 
-## run DB setup
+## Populate DB
 
 run this script to update question set in DB
 ```
 $ python -m util.runDBSetup
 ```
 
+# Starting a Task Queue
+starting celery worker on beanstalk is handles in config files in .ebextensions. To start a worker on your dev machine use the following:
 
 
-# Starting celery task queue
 ```
 $ python -m celery -A celery_tasks.celery worker --loglevel=info
 ```
+
+In dev environment rabbitmq is used as message broker in production is this is swapped out to run under aws SQS. This is configured in `config.py` 
