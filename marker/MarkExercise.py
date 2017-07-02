@@ -36,21 +36,33 @@ def check_console(test_file, q_name, args, answers):
     return {'q_id': q_id, 'question_name': q_name,'answers': anss, 'status': status,'results':results, 'messages':messages}
 
 
-def check_functions(file_path, function_name, args, answers, time_out):
+def check_functions(file_path, function_name, args, answers, time_out, no_unpack=False, nested=False, unbracket=False):
 
     result = False
     try:
         filename = os.path.basename(file_path).split('.')[0]
         function = getattr(importlib.import_module('uploads.{0}'.format(filename)), function_name)
         func = timeout(timeout=time_out)(function)
+
         if len(args) == 0:
             ans = func()
         else:
-            ans = func(*args)
-        if [ans] == answers:
-            result = True
-            print [ans]
-            print answers
+            if no_unpack:
+                ans = func(args)
+            else:
+                ans = func(*args)
+
+        if nested:
+            if ans == answers:
+                result = True
+
+        else:
+            if [ans] == answers:
+                result = True
+
+        if unbracket:
+            answers = answers[0]
+
         return {'input': args, 'result': result, 'output': ans, 'expected': answers}
     except Exception as e:
         return {'input': args, 'result': result, 'output': e.message, 'expected': answers}

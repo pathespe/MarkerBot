@@ -29,6 +29,7 @@ Mako==1.0.6
 Markdown==2.6.8
 MarkupSafe==1.0
 meld3==1.0.2
+nose2==0.6.5
 packaging==16.8
 psycopg2==2.7.1
 pycparser==2.17

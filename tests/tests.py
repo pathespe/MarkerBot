@@ -4,11 +4,11 @@ import sys
 import unittest
 import requests
 
-from dotenv import load_dotenv
-load_dotenv(os.path.join(os.path.dirname(__file__), '..',".env"))
-ROOT_URL = os.environ.get('ROOT_URL')
-p2app = os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir)
-sys.path.append(p2app)
+# from dotenv import load_dotenv
+# load_dotenv(os.path.join(os.path.dirname(__file__), '..',".env"))
+# ROOT_URL = os.environ.get('ROOT_URL')
+# p2app = os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir)
+# sys.path.append(p2app)
 
 import application
 db, app = application.run_setup()
@@ -19,7 +19,7 @@ def grab_questions(sessions, verify):
     """queries github pages for questions"""
     questions = []
     for sess_no in sessions:
-        url = '{1}Session{0}/session_{0}_problems.json'.format(sess_no, ROOT_URL)
+        url = '{1}Session{0}/session_{0}_problems.json'.format(sess_no, 'https://raw.githubusercontent.com/ArupAus/lunchtimepython/2017/')
         resp = requests.get(url, verify=verify).text
         resp = json.loads(resp)
         for question in resp:

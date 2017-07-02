@@ -21,7 +21,7 @@ from models.models import Result
 load_dotenv(os.path.abspath(os.path.join(os.path.dirname(__file__), '.env')))
 ARUP_SMTP_SERVER = os.environ.get('ARUP_SMTP_SERVER')
 
-QUESTIONS_WTIH_FILES=[19, 20, 21, 22, 23]
+QUESTIONS_WTIH_FILES=[21, 22, 23, 24, 25, 26,27,28]
 
 def copy(src, dest):
     try:
@@ -80,50 +80,44 @@ def send_reminder_email(recipient, email, question, url):
     server.sendmail(email, email, msg.as_string())
     server.quit()
 
-
+NO_UNPACK = [20]
+NESTED = [18, 19, 26, 27]
 @celery.task(bind=True, name='celery_tasks.check_function_task')
 def check_function_task(self, file_path, user_id, q_id, function_name, args, answers, timeout):
     """task that will check a submission"""
-
+    # this needs refactoring !
     results = []
     total = len(args)
     status = 'Unsucessful'
     sub_result = False
     for i, arg in enumerate(args):
         if q_id in QUESTIONS_WTIH_FILES:
-            if type(arg) == list:
-                arg[0] = os.path.join('tests', 'resources', arg[0])
+            arg[0] = os.path.join('tests', 'resources', arg[0])
+            if q_id in NESTED:
+                results.append(check_functions(file_path, function_name, arg, answers[i], timeout, nested=True))
             else:
-                arg = os.path.join('tests', 'resources', arg)
-        results.append(check_functions(file_path,
-                                       function_name,
-                                       arg,
-                                       answers[i],
-                                       timeout))
+                results.append(check_functions(file_path, function_name, arg, answers[i], timeout, unbracket=True))
 
-        self.update_state(state='PROGRESS',
-                          meta={'current': i,
-                                'total': total,
-                                'status': 'hold on m8!'})
+        elif q_id in NO_UNPACK:
+            results.append(check_functions(file_path, function_name, arg, answers[i], timeout, no_unpack=True, unbracket=True))
+
+        elif q_id in NESTED:
+            results.append(check_functions(file_path, function_name, arg, answers[i], timeout, nested=True))
+
+        else:
+            results.append(check_functions(file_path, function_name, arg, answers[i], timeout, unbracket=True))
+
+        self.update_state(state='PROGRESS', meta={'current': i, 'total': total, 'status': 'hold on m8!'})
 
     if all([x['result'] for x in results]):
         status = 'Successful!'
         sub_result = True
 
     con, meta = connect()
-    con.execute(meta.tables['results'].insert().values(user=int(user_id),
-                                                       question=q_id,
-                                                       submission_result=sub_result,
-                                                       created_date=datetime.now()))
+    con.execute(meta.tables['results'].insert().values(user=int(user_id), question=q_id, submission_result=sub_result, created_date=datetime.now()))
     con.dispose()
 
-    return {'question_name': function_name,
-            'current': i,
-            'q_id': q_id,
-            'total': total,
-            'status': status,
-            'result': results
-            }
+    return {'question_name': function_name, 'current': i, 'q_id': q_id, 'total': total, 'status': status, 'result': results}
 
 
 # @celery.task(name='celery_tasks.check_console_task')
