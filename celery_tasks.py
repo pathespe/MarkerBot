@@ -12,7 +12,7 @@ from util.Cloud import s3_send
 from email.mime.text import MIMEText
 
 from application import celery
-from marker.MarkExercise import check_functions, check_console
+from marker.MarkExercise import check_functions
 from util.sesEmail import Email
 from util.DBUtilities import connect
 from models.models import Result
