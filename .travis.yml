@@ -1,8 +1,11 @@
 language: python
 python:
-  - "2.7" # 3.7 development branch
+  - "2.7"
+  # - "3.4" # 3.7 development branch
 # command to install dependencies
-install: "pip install -r requirements.txt"
+install:
+  - travis_retry pip install -r requirements.txt
+  - travis_retry pip install coveralls
 # command to run tests
 
 before_script:
@@ -10,7 +13,9 @@ before_script:
 script: python manage.py db init
 script: python manage.py db migrate
 script: python manage.py db upgrade
-script: nose2
+script: nose2 --with-cov --coverage-report term --coverage-report html --coverage views --coverage api --coverage marker
 
 services:
   - postgresql
+after_success:
+  - coveralls

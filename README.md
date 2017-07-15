@@ -25,13 +25,13 @@ Automates python assignment marking for https://github.com/ArupAus/lunchtimepyth
           +----------> |     Web Server    +-----------------------> |      Database     |
           |            |      (aws-eb)     |                         | (aws-rds)postgres |
           |            +-------------------+                         +-------------------+
-          |                                                                     |
-          |                                                                     |
-+---------+------------------+                         +-------------------+    |
-|          Browser           |                         | Background Worker | <--+
-|lunchtimeprogramming.arup.io|                         |  (celery/aws-sqs) |
-+----------------------------+                         +-------------------+
-
+          |                            ^                                        |         
+          |                            |                                        |         
++---------+------------------+         |               +-------------------+    |         
+|          Browser           |         +---------------| Background Worker | <--+         
+|lunchtimeprogramming.arup.io|                         |  (celery/aws-sqs) |              
++----------------------------+                         +-------------------+              
+                                                                                          
 ```
 
 
@@ -90,3 +90,9 @@ $ python -m celery -A celery_tasks.celery worker --loglevel=info
 ```
 
 In dev environment rabbitmq is used as message broker in production is this is swapped out to run under aws SQS. This is configured in `config.py` 
+
+## Running the test suite
+
+```
+nose2 --with-cov --coverage-report term --coverage-report html --coverage views --coverage api
+```

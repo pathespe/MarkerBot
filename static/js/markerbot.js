@@ -76,7 +76,7 @@ frm.submit(function (ev) {
 });
 
 function unpack_result(results){
-    var output = '<div class="table-responsive"><table class="table table-hover"><thead><tr>th>Input</th><th>Output</th><th>Expected</th><th>Result</th></tr></thead><tbody>';
+    var output = '<div class="table-responsive"><table class="table table-hover"><thead><tr><th>Input</th><th>Output</th><th>Expected</th><th>Result</th></tr></thead><tbody>';
     for (var i= 0; i < results.length; i++){
         output += '<tr><td>' + results[i]['input'] + 
                    '</td><td> ' + JSON.stringify(results[i]['output']) +
@@ -96,24 +96,26 @@ function unpack_user_progress(user_progress){
     return output + '</tbody></table>';
 }
 
+var MAX_PINGS = 2;
+
+var ping_count = 0;
+
 function update_progress(status_url) {
     // send GET request to status URL
     $.getJSON(status_url, function(data) {
         // update UI
-
         percent = parseInt(data['current'] * 100 / data['total']);
-
         $('#messages').empty();
         $('#messages').html('<h3>hang on m8!</h3>');
         bar.animate(percent/100);
 
         if (data['state'] != 'PENDING' && data['state'] != 'PROGRESS') {
+            ping_count = 0;
             if ('result' in data) {
                 status = data['status'];
                 messages = unpack_result(data['result']);
                 question_name = data['question_name'];
                 q_id =data['q_id'];
-                console.log(data);
                 /// show results in a modal
                 $('#modalConent').html(
                     '<div><h3>Results</h3>' + messages + '</div>' +
@@ -122,7 +124,6 @@ function update_progress(status_url) {
                 bar.animate(1);
                 $('#myModalLabel').html('<h1>'+question_name+'</h1>');
                 $('#myModal').modal('show');
-
                 // create a tick beside question if the attempt is sucessful
                 if (status === 'Successful!'){
                     $('#' + q_id).html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>');
@@ -130,7 +131,6 @@ function update_progress(status_url) {
                     $('#' + q_id).html('<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>');
                 }
                 $('#messages').html('<h3>marking complete, prego!</h3>');
-
             }
             else {
                 // something unexpected happened
@@ -138,10 +138,18 @@ function update_progress(status_url) {
             }
         }
         else {
-            // rerun in 2 seconds
-            setTimeout(function() {
-                update_progress(status_url);
-            }, 2000);
+            ping_count++;
+            if (ping_count <= MAX_PINGS){
+                // rerun in 2 seconds
+                console.log('ping!');
+                setTimeout(function() {
+                    update_progress(status_url);
+                }, 2000);
+            }else{
+                console.log('no more pings!');
+                alert('Unfortunately your submission was unable to complete in time. Please ensure you have removed all print statements, input functions and test cases before submitting again.');
+            }
+
         }
     });
 }
@@ -169,8 +177,6 @@ function panel_ticks(){
         }});
 }
 
-
-
 function changeText(idElement) {
     key = 'session_'+String(idElement)
     $('#main-div').html(pageContent[key]);
@@ -184,7 +190,6 @@ function changeText(idElement) {
 }
 
 //// main div event handlers
-
 $("#button").click(function() {
     $('#main-div').html(cheat['cheat']);
     Prism.highlightAll();
@@ -196,10 +201,8 @@ $("#prebutton").click(function() {
 });
 
 // modal event handlers
-
 $("#your_progress").click(function() {
     $.ajax({
-
         url: "/api/user-progress/" + user_id + "/",
         type: 'GET',
         async: false,
@@ -218,7 +221,19 @@ $("#your_progress").click(function() {
 });
 
 $("#about").click(function() {
-    $('#modalConent').html("<p>The lunchtime programming courses were started in 2016 in the Arup Sydney office by Alex Smith and Patrick Hespe.</p></br><p>The course aim isn't to turn everyone into software engineers, but to upskill Arup employees so they can work smarter not harder.Our view is that computers are good at repetitive tasks so why not let them to the mundane, while you focus on overarching task at hand.</p><br/><p> We hope you end up loving writing programs to remove tedious tasks from your day to day too.</p><hr/><h3>Acknowledgements</h3><p><b>Big &#10084; to Arup Digital & Arup Uni for supporting this course</b>and a special mention to the tutors, content writers and friends of the coursewithout whom it wouldn't have been possible. So muchos gracias to the following in <code>random.shuffle()</code> order:</p><ul><li>Tom Valorsa</li><li>Sam Diamond</li><li>Ian MacKenzie</li><li>Ben Harrison</li><li>Ben Brannon</li><li>Kim Sherwin</li><li>Selma Parris</li><li>Penny Maber</li><li>Oliver Lock</li><li>Tom Gasson</li></ul><hr/><p>This <b>Lunchtime Markerbot</b> aka this site built with coffee, late nights and love by Patrick Hespe</p>");
+
+    // move this to lunchtime session or seprate file!
+    var s1 = "<p>The lunchtime programming courses were started in 2016 in the Arup Sydney office by Alex Smith and Patrick Hespe.</p></br>"+
+    "<p>The course aim isn't to turn everyone into software engineers, but to upskill Arup employees so they can work smarter not harder. "+
+    "Our view is that computers are good at repetitive tasks so why not let them do the mundane, while you focus on overarching task at hand.</p>"+
+    "<br/><p> We hope you end up loving writing programs to remove tedious tasks from your day to day too.</p><hr/>"+
+    "<h3>Acknowledgements</h3><p><b>Big &#10084; to Arup Digital & Arup Uni for supporting this course</b> and a special mention to the tutors,"+
+    "content writers and friends of the course without whom it wouldn't have been possible. So muchos gracias to the following in"+
+    "<code>random.shuffle()</code> order:</p><ul><li>Tom Valorsa</li><li>Sam Diamond</li><li>Ian MacKenzie</li><li>Ben Harrison</li><li>Ben Brannon</li>"+
+    "<li>Kim Sherwin</li><li>Tom Clark</li><li>Selma Parris</li><li>Penny Maber</li><li>Oliver Lock</li><li>Tom Gasson</li></ul><hr/><p>"+
+    "This <b>Lunchtime Markerbot</b> aka this site built with coffee, late nights and love by Patrick Hespe</p>";
+
+    $('#modalConent').html(s1);
     $('#myModalLabel').html('<h1>About Lunchtime Programming</h1>');
     $('#myModal').modal('show');
 });
@@ -243,19 +258,16 @@ $("#leaderbutton").click(function() {
 function unpack_ranking(p){
     var rank = 0;
     var output = "<table class='table table-hover'><thead><tr><th>Rank</th><th>User</th><th>Questions Complete</th></tr></thead><tbody>";
-
     var prev_count = -999;
     for (var i= 0; i < p.length; i++){
         if (p[i][1]['count'] != prev_count){
             rank = i +1;
             prev_count = p[i][1]['count'];
         }
-
         output += '<tr><td>' + rank + 
                    '</td><td>' + p[i][1]['user'] + 
                    '</td><td> ' + p[i][1]['count'] + '</tr>'
     }
-
     return output + "</tbody></table><p>* Reverse Aplhabetical in case of a tie</p><p>** Number of attempts not considered</p>";
 }
 

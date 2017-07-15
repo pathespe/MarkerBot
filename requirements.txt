@@ -11,6 +11,8 @@ certifi==2017.4.17
 cffi==1.10.0
 chardet==3.0.3
 click==6.7
+cov-core==1.15.0
+coverage==4.4.1
 dotenv==0.0.5
 filechunkio==1.8
 Flask==0.12.2

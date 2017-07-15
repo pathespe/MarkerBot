@@ -115,6 +115,11 @@ def callback_handling():
     session[PROFILE_KEY] = json.loads(user_info)
     # return user_info
     # extract data to register user on DB in order top track question set progress
+    register_user()
+
+    return redirect('/index')
+
+def register_user():
     first_name = session['profile']['given_name']
     surname = session['profile']['family_name']
     try:
@@ -140,4 +145,4 @@ def callback_handling():
 
     # add user id from DB to the session
     session['user_id'] = user.id
-    return redirect('/index')
+    return True

@@ -9,7 +9,7 @@ import werkzeug
 from application import db
 from models.models import Question, Result, User
 from datetime import datetime
-
+from collections import OrderedDict
 
 mark_api = Api(Blueprint('mark_api', __name__))
 
@@ -75,6 +75,7 @@ def print_divide_py3(filepath):
         for line in lines:
             f_out.write(line)
 
+    return filepath, True
 
 @mark_api.resource('/marking-poll/<task_id>')
 class MarkPollAPI(Resource):
@@ -154,7 +155,6 @@ class MarkRankingsAPI(Resource):
         a = db.session.query(Result, User).filter(Result.user == User.id)\
             .filter(Result.submission_result == True).all()
 
-        from collections import OrderedDict
         out = {}
         for result in a:
             if result.User.id not in out.keys():
