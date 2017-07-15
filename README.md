@@ -94,5 +94,5 @@ In dev environment rabbitmq is used as message broker in production is this is s
 ## Running the test suite
 
 ```
-nose2
+nose2 --with-cov --coverage-report term --coverage-report html --coverage views --coverage api
 ```
