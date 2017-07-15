@@ -1,6 +1,7 @@
 import io
 import os
 import sys
+import copy
 import subprocess
 import importlib
 from dotenv import load_dotenv
@@ -10,6 +11,7 @@ dotenv_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '.en
 load_dotenv(dotenv_path)
 PYTHON_EXE = os.environ.get('PYTHON_EXE')
 
+# might bring this back next year, dont know yet...
 
 # def check_console(test_file, q_name, args, answers):
 
@@ -40,29 +42,37 @@ def check_functions(file_path, function_name, args, answers, time_out, no_unpack
 
     result = False
     try:
+
+        # get the function out of the file submitted
         filename = os.path.basename(file_path).split('.')[0]
         function = getattr(importlib.import_module('uploads.{0}'.format(filename)), function_name)
         func = timeout(timeout=time_out)(function)
 
-        if len(args) == 0:
+        # make a copy to submit to function incase argument is mutatable
+        args_in = copy.copy(args)
+
+        # check the number of args and call function accrodingly
+        if len(args_in) == 0:
             ans = func()
         else:
             if no_unpack:
-                ans = func(args)
+                ans = func(args_in)
             else:
-                ans = func(*args)
-
+                ans = func(*args_in)
+        
+        # if answer is within an array
         if nested:
             if ans == answers:
                 result = True
-
         else:
             if [ans] == answers:
                 result = True
 
+        # remove bracktes for display in markerbot
         if unbracket:
             answers = answers[0]
 
         return {'input': args, 'result': result, 'output': ans, 'expected': answers}
+
     except Exception as e:
         return {'input': args, 'result': result, 'output': e.message, 'expected': answers}

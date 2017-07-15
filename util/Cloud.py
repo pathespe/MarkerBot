@@ -14,7 +14,7 @@ AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
 S3_ROOT = os.environ.get('S3_ROOT')
 
-def s3_send(source_path, filename, bucketname='windeng'):
+def s3_send(source_path, filename, bucketname='markerbot'):
     """send a file to s3"""
     c = boto.connect_s3(AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)
     b = c.get_bucket(bucketname, validate=False)
