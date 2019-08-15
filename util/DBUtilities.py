@@ -9,7 +9,6 @@ load_dotenv(dotenv_path)
 def connect(PoolConnection=False):
     '''Returns a connection and a metadata object'''
     url = os.environ['DATABASE_URL']
-
     if PoolConnection:
         con = sqlalchemy.create_engine(url, client_encoding='utf8')
     else:

@@ -9,7 +9,7 @@ from timeout import timeout
 
 dotenv_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '.env'))
 load_dotenv(dotenv_path)
-PYTHON_EXE = os.environ.get('PYTHON_EXE')
+#PYTHON_EXE = os.environ.get('PYTHON_EXE')
 
 # might bring this back next year, dont know yet...
 
@@ -59,7 +59,7 @@ def check_functions(file_path, function_name, args, answers, time_out, no_unpack
                 ans = func(args_in)
             else:
                 ans = func(*args_in)
-        
+
         # if answer is within an array
         if nested:
             if ans == answers:

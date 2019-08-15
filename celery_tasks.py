@@ -89,7 +89,7 @@ def send_reminder_email(recipient, email, question, url):
 
 
 
-@celery.task(bind=True, name='celery_tasks.check_function_task', soft_time_limit=3, time_limit=5)
+@celery.task(bind=True, name='celery_tasks.check_function_task', soft_time_limit=5, time_limit=10)
 def check_function_task(self, file_path, user_id, q_id, function_name, args, answers, timeout):
     """task that will check a submission"""
     # this needs refactoring !
@@ -149,7 +149,7 @@ def check_function_task(self, file_path, user_id, q_id, function_name, args, ans
 # @celery.task(name='celery_tasks.spam_users')
 # def spam_users(file_path, function_name, q_id, answers):
 #     # hassle users that have stopped logging in and completing questions...?
-#     # could check for last attempt in results table if its been over 
+#     # could check for last attempt in results table if its been over
 #     # 2 weeks send them an email saying we miss you try this question
 #     # send_reminder_emailp(recipient, email, question, url)
 #     pass

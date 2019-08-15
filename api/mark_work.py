@@ -5,7 +5,7 @@ import uuid
 from flask import Blueprint, request, jsonify, url_for
 from flask_restful import Api, Resource, reqparse
 from celery_tasks import check_function_task
-import werkzeug 
+import werkzeug
 from application import db
 from models.models import Question, Result, User
 from datetime import datetime
@@ -159,7 +159,7 @@ class MarkRankingsAPI(Resource):
         for result in a:
             if result.User.id not in out.keys():
                 out[result.User.id] = {'user': '{0} {1}'.format(result.User.first_name, result.User.surname),
-                                       'count': 1, 
+                                       'count': 1,
                                        'q_id': [result.Result.question] }
                 continue
             if result.Result.question not in out[result.User.id]['q_id']:

@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  labels:
+    app: markerbot
+spec:
+  selector:
+    service: postgres
+  ports:
+  - port: 5432
+  type: ClusterIP
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: markerbot
+  name: postgres
+spec:
+  selector:
+  # matchLabels:
+  #   app: markerbot
+  #   tier: web
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        service: postgres
+        app: markerbot
+        tier: web
+    spec:
+      containers:
+      - image: postgres:9.6-alpine
+        name: postgres
+        ports:
+        - containerPort: 5432
