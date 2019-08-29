@@ -69,4 +69,4 @@ logger = LocalProxy(lambda: app.logger)
 
 if __name__ == '__main__':
     db, app = run_setup()
-    app.run(os.environ['HOST'])
+    app.run('0.0.0.0')

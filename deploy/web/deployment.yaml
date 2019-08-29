@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: markerbotweb
+  labels:
+    app: markerbot
+spec:
+  selector:
+    app: markerbot
+    tier: web
+  ports:
+  - port: 80
+    targetPort: 5000
+  type: LoadBalancer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: markerbotweb
+  labels:
+    app: markerbot
+spec:
+  selector:
+    matchLabels:
+      app: markerbot
+      tier: web
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: markerbot
+        tier: web
+    spec:
+      containers:
+      - name: markerbot
+        image: 341244846562.dkr.ecr.ap-southeast-2.amazonaws.com/markerbot:latest
+        ports:
+        - containerPort: 5000
+        env:
+        - name: FLASK_ENV
+          value: "development"
+        - name: APP_SETTINGS
+          value: "config.DevelopmentConfig"
