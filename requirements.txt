@@ -16,7 +16,7 @@ coverage==4.4.1
 filechunkio==1.8
 Flask==0.12.2
 Flask-Celery==2.4.3
-Flask-Cors==3.0.2
+Flask-Cors==3.0.9
 Flask-Markdown==0.3
 Flask-Migrate==2.0.4
 Flask-RESTful==0.3.6
