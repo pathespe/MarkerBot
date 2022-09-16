@@ -26,7 +26,7 @@ idna==2.5
 itsdangerous==0.24
 Jinja2==2.9.6
 kombu==3.0.37
-Mako==1.0.6
+Mako==1.2.2
 Markdown==2.6.8
 MarkupSafe==1.0
 meld3==1.0.2
