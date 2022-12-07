@@ -7,7 +7,7 @@ auth0-python==3.0.0
 billiard==3.3.0.23
 boto==2.47.0
 celery==3.1.25
-certifi==2017.4.17
+certifi==2022.12.7
 cffi==1.10.0
 chardet==3.0.3
 click==6.7
